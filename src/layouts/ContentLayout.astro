@@ -1,0 +1,58 @@
+---
+import Container from "../components/common/Container.astro";
+import Breadcrumbs from "../components/common/Breadcrumbs.astro";
+import { formatDate } from "../utils/content";
+
+interface Props {
+  breadcrumbs: { label: string; href?: string }[];
+  title: string;
+  description: string;
+  pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  heroImage?: string;
+  heroImageAlt?: string;
+  tags?: string[];
+  category?: string;
+}
+
+const {
+  breadcrumbs,
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  author,
+  heroImage,
+  heroImageAlt = "",
+  tags = [],
+  category,
+} = Astro.props;
+---
+
+<Container className="py-12">
+  <Breadcrumbs items={breadcrumbs} />
+  <header class="mb-8 max-w-4xl">
+    {category && <p class="eyebrow">{category}</p>}
+    <h1 class="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">{title}</h1>
+    <p class="mt-4 text-slate-600">{description}</p>
+    {(pubDate || author) && (
+      <p class="mt-4 text-sm text-slate-500">
+        {pubDate && formatDate(pubDate)}
+        {updatedDate && ` • Updated ${formatDate(updatedDate)}`}
+        {author && ` • ${author}`}
+      </p>
+    )}
+    {tags.length > 0 && (
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {tags.map((tag) => <li class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-600">{tag}</li>)}
+      </ul>
+    )}
+  </header>
+
+  {heroImage && <img src={heroImage} alt={heroImageAlt} class="mb-8 w-full rounded-3xl border border-slate-200 bg-white p-2 shadow-sm" loading="lazy" width="1600" height="900" />}
+
+  <article class="prose-content">
+    <slot />
+  </article>
+</Container>

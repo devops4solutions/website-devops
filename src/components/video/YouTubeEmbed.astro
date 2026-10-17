@@ -1,0 +1,54 @@
+---
+interface Props {
+  youtubeId: string;
+  title: string;
+  ratio?: "video" | "short";
+}
+
+const { youtubeId, title, ratio = "video" } = Astro.props;
+const thumbnail = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+---
+
+<div class={`group relative overflow-hidden rounded-xl border border-slate-700 bg-slate-900 ${ratio === "short" ? "aspect-[9/16]" : "aspect-video"}`}>
+  <button
+    type="button"
+    class="absolute inset-0 z-10 flex h-full w-full items-center justify-center bg-slate-950/20 text-white transition hover:bg-slate-950/40"
+    aria-label={`Play ${title}`}
+    data-youtube-id={youtubeId}
+    data-youtube-title={title}
+  >
+    <span class="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950">Play</span>
+  </button>
+  <img src={thumbnail} alt={`YouTube thumbnail for ${title}`} loading="lazy" width="1280" height="720" class="h-full w-full object-cover" />
+  <noscript>
+    <p class="absolute inset-0 grid place-items-center bg-slate-950/80 text-sm">
+      <a href={`https://www.youtube.com/watch?v=${youtubeId}`} target="_blank" rel="noreferrer">Watch on YouTube</a>
+    </p>
+  </noscript>
+</div>
+
+<script>
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const button = target.closest("button[data-youtube-id]");
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const id = button.dataset.youtubeId;
+    const title = button.dataset.youtubeTitle ?? "YouTube video";
+    if (!id) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    iframe.title = title;
+    iframe.loading = "lazy";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    iframe.className = "absolute inset-0 h-full w-full";
+
+    const parent = button.parentElement;
+    if (!parent) return;
+    parent.innerHTML = "";
+    parent.appendChild(iframe);
+  });
+</script>

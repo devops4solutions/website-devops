@@ -1,0 +1,29 @@
+---
+import Container from "./Container.astro";
+import MobileMenu from "./MobileMenu.astro";
+import Button from "./Button.astro";
+import { siteConfig } from "../../data/site";
+---
+
+<header class="sticky top-0 z-40 border-b border-blue-100 bg-blue-50/85 backdrop-blur" data-pagefind-ignore>
+  <Container className="py-0">
+    <div class="flex h-16 items-center justify-between gap-4">
+      <a href="/" class="flex flex-col leading-tight" style="text-decoration:none; color:#334155">
+        <span class="text-[1.82rem] font-bold tracking-tight" style="color:#05306e">DevOps4Solutions</span>
+        <span class="text-[0.65rem] font-medium tracking-wide" style="color:#334155; opacity:0.7">Learn Enterprise DevOps Through Real-World Experience</span>
+      </a>
+      <nav aria-label="Primary Navigation" class="hidden md:block">
+        <ul class="flex items-center gap-1">
+          {siteConfig.navigation.filter(item => item.label !== 'Home' && item.label !== 'Contact').map((item) => (
+            <li><a href={item.href} class="rounded px-3 py-1.5 text-[1.225rem] font-bold text-slate-700 transition-colors hover:bg-white/90 hover:text-slate-950" style="text-decoration:none">{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <div class="hidden items-center gap-2 md:flex">
+        <a href="/search.html" class="rounded-full border border-blue-200 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 hover:text-blue-800" style="text-decoration:none">Search</a>
+        <a href="/contact.html" class="rounded-full bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 hover:text-white" style="text-decoration:none">Contact</a>
+      </div>
+      <MobileMenu />
+    </div>
+  </Container>
+</header>

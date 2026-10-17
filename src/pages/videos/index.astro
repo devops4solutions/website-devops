@@ -1,0 +1,70 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/common/Container.astro";
+import VideoCard from "../../components/video/VideoCard.astro";
+
+const entries = (await getCollection("videos") as CollectionEntry<"videos">[])
+  .filter((entry: CollectionEntry<"videos">) => !entry.data.draft)
+  .sort((a: CollectionEntry<"videos">, b: CollectionEntry<"videos">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const shorts = entries.filter((entry: CollectionEntry<"videos">) => entry.data.videoType === "short");
+const longForm = entries.filter((entry: CollectionEntry<"videos">) => entry.data.videoType === "video");
+const categories = [...new Set(entries.map((entry: CollectionEntry<"videos">) => entry.data.category))].sort();
+---
+
+<BaseLayout title="Videos | DevOps4Solutions" description="YouTube videos and shorts on AWS and DevOps.">
+  <Container className="py-14">
+    <h1 class="text-3xl font-semibold text-slate-950">Videos</h1>
+
+    <div class="mt-4 flex flex-wrap gap-2" role="toolbar" aria-label="Filter videos by category">
+      <button type="button" class="video-filter rounded-full border border-blue-500 px-3 py-1 text-sm text-blue-600" data-category="all" aria-pressed="true">All</button>
+      {categories.map((category: string) => (
+        <button type="button" class="video-filter rounded-full border border-slate-300 px-3 py-1 text-sm text-slate-600 hover:border-blue-400 hover:text-blue-600" data-category={category} aria-pressed="false">{category}</button>
+      ))}
+    </div>
+
+    <section class="mt-10" aria-labelledby="shorts-heading">
+      <h2 id="shorts-heading" class="text-2xl font-semibold text-slate-950">YouTube Shorts</h2>
+      <div id="shorts-grid" class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {shorts.map((video: CollectionEntry<"videos">) => (
+          <div data-category={video.data.category}><VideoCard video={video} /></div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-12" aria-labelledby="videos-heading">
+      <h2 id="videos-heading" class="text-2xl font-semibold text-slate-950">Long-form Videos</h2>
+      <div id="videos-grid" class="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {longForm.map((video: CollectionEntry<"videos">) => (
+          <div data-category={video.data.category}><VideoCard video={video} /></div>
+        ))}
+      </div>
+    </section>
+  </Container>
+</BaseLayout>
+
+<script>
+  const filters = Array.from(document.querySelectorAll(".video-filter"));
+  const cards = Array.from(document.querySelectorAll("#shorts-grid > div, #videos-grid > div"));
+
+  filters.forEach((filter) => {
+    filter.addEventListener("click", () => {
+      if (!(filter instanceof HTMLButtonElement)) return;
+      const category = filter.dataset.category ?? "all";
+
+      filters.forEach((el) => {
+        if (!(el instanceof HTMLButtonElement)) return;
+        const active = el === filter;
+        el.setAttribute("aria-pressed", String(active));
+      });
+
+      cards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const current = card.dataset.category ?? "";
+        card.hidden = category !== "all" && current !== category;
+      });
+    });
+  });
+</script>

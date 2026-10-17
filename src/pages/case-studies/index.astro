@@ -1,0 +1,60 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/common/Container.astro";
+import CaseStudyCard from "../../components/content/CaseStudyCard.astro";
+
+const caseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
+  .filter((item: CollectionEntry<"caseStudies">) => !item.data.draft)
+  .sort((a: CollectionEntry<"caseStudies">, b: CollectionEntry<"caseStudies">) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return b.data.pubDate.getTime() - a.data.pubDate.getTime();
+  });
+
+const industries = [...new Set(caseStudies.map((item: CollectionEntry<"caseStudies">) => item.data.industry ?? "General"))].sort();
+---
+
+<BaseLayout title="Case Studies | DevOps4Solutions" description="Enterprise AWS and DevOps case studies.">
+  <Container className="py-14">
+    <h1 class="text-3xl font-semibold text-slate-950">Case Studies</h1>
+    <div class="mt-5 flex flex-wrap gap-2" role="toolbar" aria-label="Filter case studies by industry">
+      <button type="button" class="filter-chip rounded-full border border-blue-500 px-3 py-1 text-sm text-blue-600" data-filter="all" aria-pressed="true">All</button>
+      {industries.map((industry: string) => (
+        <button type="button" class="filter-chip rounded-full border border-slate-300 px-3 py-1 text-sm text-slate-600 hover:border-blue-400 hover:text-blue-600" data-filter={industry} aria-pressed="false">{industry}</button>
+      ))}
+    </div>
+
+    <div id="case-study-grid" class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {caseStudies.map((item: CollectionEntry<"caseStudies">) => <CaseStudyCard item={item} />)}
+    </div>
+  </Container>
+</BaseLayout>
+
+<script>
+  const chips = Array.from(document.querySelectorAll(".filter-chip"));
+  const cards = Array.from(document.querySelectorAll("#case-study-grid article"));
+
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      if (!(chip instanceof HTMLButtonElement)) return;
+      const filter = chip.dataset.filter ?? "all";
+
+      chips.forEach((el) => {
+        if (!(el instanceof HTMLButtonElement)) return;
+        const active = el === chip;
+        el.setAttribute("aria-pressed", String(active));
+        el.classList.toggle("border-blue-500", active);
+        el.classList.toggle("text-blue-600", active);
+        el.classList.toggle("border-slate-300", !active);
+        el.classList.toggle("text-slate-600", !active);
+      });
+
+      cards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const industry = card.dataset.industry ?? "General";
+        card.hidden = filter !== "all" && industry !== filter;
+      });
+    });
+  });
+</script>

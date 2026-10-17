@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/common/Container.astro";
+---
+
+<BaseLayout title="Contact | DevOps4Solutions" description="Contact DevOps4Solutions.">
+  <section class="border-b border-slate-200 bg-white py-12">
+    <Container>
+      <p class="eyebrow mb-2">Get in touch</p>
+      <h1 class="text-3xl font-bold text-slate-950 sm:text-4xl">Contact Us</h1>
+      <p class="mt-3 text-slate-500">Reach out for architecture reviews, migration planning, or platform engineering support.</p>
+    </Container>
+  </section>
+
+  <Container className="py-12">
+    <div class="grid gap-10 lg:grid-cols-[1fr_320px]">
+      <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-xl font-semibold text-slate-950">Contact support</h2>
+        <p class="mt-3 text-slate-600">If you have any questions or need support, please email us at <a href="mailto:devops4solutions@gmail.com" class="text-blue-600 hover:underline">devops4solutions@gmail.com</a>.</p>
+      </section>
+
+      <!-- Contact details sidebar -->
+      <aside class="space-y-5">
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">Contact details</h2>
+          <ul class="space-y-3 text-sm text-slate-700">
+            <li><span class="font-medium">Email</span><br/><a href="mailto:devops4solutions@gmail.com" class="text-blue-600 hover:underline">devops4solutions@gmail.com</a></li>
+            <li><span class="font-medium">YouTube</span><br/><a href="https://www.youtube.com/@DevOps4solutions/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">@DevOps4solutions</a></li>
+            <li><span class="font-medium">LinkedIn</span><br/><a href="https://www.linkedin.com/in/nidhi-gupta-6a289575/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">Nidhi Gupta</a></li>
+            <li><span class="font-medium">Instagram</span><br/><a href="https://www.instagram.com/devops4solutions/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">@devops4solutions</a></li>
+          </ul>
+        </div>
+        <div class="rounded-xl border border-blue-100 bg-blue-50 p-5">
+          <p class="text-sm font-semibold text-slate-950">Prefer to browse first?</p>
+          <ul class="mt-3 space-y-2 text-sm">
+            <li><a href="/services.html" class="text-blue-600 hover:underline">View all services →</a></li>
+            <li><a href="/case-studies.html" class="text-blue-600 hover:underline">Read case studies →</a></li>
+            <li><a href="/blog.html" class="text-blue-600 hover:underline">Read the blog →</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </Container>
+</BaseLayout>

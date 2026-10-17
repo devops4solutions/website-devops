@@ -1,0 +1,73 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostLayout from "../../layouts/BlogPostLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("blog") as CollectionEntry<"blog">[])
+    .filter((post: CollectionEntry<"blog">) => !post.data.draft)
+    .sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+  return posts.map((post: CollectionEntry<"blog">, index: number) => ({
+    params: { id: post.id },
+    props: {
+      post,
+      previous: posts[index - 1],
+      next: posts[index + 1],
+      allPosts: posts,
+    },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  previous?: CollectionEntry<"blog">;
+  next?: CollectionEntry<"blog">;
+  allPosts: CollectionEntry<"blog">[];
+}
+
+const { post, previous, next, allPosts } = Astro.props;
+const { Content } = await render(post);
+
+const related = allPosts
+  .filter((item: CollectionEntry<"blog">) => item.id !== post.id && item.data.tags.some((tag: string) => post.data.tags.includes(tag)))
+  .slice(0, 3);
+
+const canonical = post.data.canonicalUrl ?? new URL(`/blog/${post.id}.html`, Astro.site).toString();
+
+const blogPostingSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  author: { "@type": "Person", name: post.data.author },
+  mainEntityOfPage: canonical,
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: new URL("/", Astro.site).toString() },
+    { "@type": "ListItem", position: 2, name: "Blog", item: new URL("/blog.html", Astro.site).toString() },
+    { "@type": "ListItem", position: 3, name: post.data.title, item: canonical },
+  ],
+};
+---
+
+<BaseLayout
+  title={`${post.data.title} | DevOps4Solutions`}
+  description={post.data.description}
+  canonicalUrl={canonical}
+  ogImage={post.data.image}
+  type="article"
+>
+  <BlogPostLayout post={post} related={related} previous={previous} next={next}>
+    <Content />
+  </BlogPostLayout>
+  <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
+</BaseLayout>

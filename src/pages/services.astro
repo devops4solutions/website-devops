@@ -1,0 +1,225 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/common/Container.astro";
+---
+
+<BaseLayout title="Services | DevOps4Solutions" description="Enterprise AWS architecture, DevOps automation, Terraform, Kubernetes, migration, and platform engineering services.">
+  <!-- Page header -->
+  <section class="border-b border-slate-200 bg-white py-14">
+    <Container>
+      <p class="eyebrow mb-3">What we do</p>
+      <h1 class="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">Services</h1>
+     
+    </Container>
+  </section>
+
+  <!-- AWS Architecture -->
+  <section class="border-b border-slate-200 bg-white py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">AWS Cloud Architecture</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Landing Zone Design</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Multi-account AWS organization structure</li>
+            <li>• Network topology and VPC design</li>
+            <li>• Identity and access management baselines</li>
+            <li>• Security controls and guardrails</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Workload Architecture</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Compute, storage, and database patterns</li>
+            <li>• High-availability and resilience design</li>
+            <li>• Cost-aware architecture decisions</li>
+            <li>• Architecture documentation and runbooks</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Architecture Assessment</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Well-Architected framework reviews</li>
+            <li>• Gap analysis and remediation roadmap</li>
+            <li>• Security posture evaluation</li>
+            <li>• Operational readiness checks</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Infrastructure as Code -->
+  <section class="border-b border-slate-200 bg-slate-50 py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">Terraform &amp; Infrastructure as Code</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Module Development</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Reusable EC2, ECS, RDS, and EKS modules</li>
+            <li>• Mandatory tagging and naming enforcement</li>
+            <li>• Encryption and monitoring defaults</li>
+            <li>• IAM role and security group templates</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Platform Standards</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Shared module registries</li>
+            <li>• State management best practices</li>
+            <li>• Workspace and environment separation</li>
+            <li>• Drift detection and compliance checks</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">IaC Modernization</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Migration from manual or legacy IaC</li>
+            <li>• Refactoring duplicated Terraform code</li>
+            <li>• Governance and review processes</li>
+            <li>• Team enablement and knowledge transfer</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Kubernetes & Containers -->
+  <section class="border-b border-slate-200 bg-white py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">Kubernetes, EKS &amp; Containers</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Amazon EKS</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• EKS cluster design and provisioning</li>
+            <li>• Node group and Fargate profile configuration</li>
+            <li>• Ingress, networking, and service mesh</li>
+            <li>• Cluster autoscaling and cost controls</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Amazon ECS &amp; Fargate</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Service task definition standardization</li>
+            <li>• Fargate serverless container operations</li>
+            <li>• Service discovery and load balancing</li>
+            <li>• Baseline metrics, alarms, and log routing</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Platform Readiness</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Container image scanning and promotion gates</li>
+            <li>• Runtime security policies</li>
+            <li>• On-call runbook codification</li>
+            <li>• Multi-team enablement templates</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CI/CD -->
+  <section class="border-b border-slate-200 bg-slate-50 py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">CI/CD Automation</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Pipeline Design</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• GitHub Actions and Jenkins pipelines</li>
+            <li>• Branch and environment promotion strategies</li>
+            <li>• Approval gates and policy checks</li>
+            <li>• Secrets and credential management</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Deployment Patterns</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Blue/green and canary deployment models</li>
+            <li>• Infrastructure pipeline integration</li>
+            <li>• Rollback and failure recovery procedures</li>
+            <li>• Environment parity and drift prevention</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Quality &amp; Governance</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Static analysis and security scanning</li>
+            <li>• Compliance checks in pipeline stages</li>
+            <li>• Test automation integration</li>
+            <li>• Pipeline metrics and observability</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Migration & Operations -->
+  <section class="border-b border-slate-200 bg-white py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">Cloud Migration &amp; Operations</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Migration Planning</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Discovery and dependency mapping</li>
+            <li>• Wave planning and sequencing</li>
+            <li>• Risk identification and mitigation</li>
+            <li>• Stakeholder readiness coordination</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Patch Automation</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• AWS Systems Manager patch baselines</li>
+            <li>• Maintenance window and targeting design</li>
+            <li>• Compliance reporting and audit trails</li>
+            <li>• CloudWatch and Splunk integration</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-950">Observability</h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• CloudWatch metrics, logs, and alarms</li>
+            <li>• Splunk log ingestion and dashboards</li>
+            <li>• Alerting and on-call runbooks</li>
+            <li>• Cost monitoring and anomaly detection</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Engagement approach -->
+  <section class="bg-slate-50 py-12">
+    <Container>
+      <h2 class="mb-8 text-2xl font-bold text-slate-950">How We Work</h2>
+      <ol class="grid gap-4 sm:grid-cols-5">
+        {[
+          { step: "01", title: "Discovery", desc: "Understand goals, existing state, and constraints." },
+          { step: "02", title: "Assessment", desc: "Architecture review, gap analysis, and prioritization." },
+          { step: "03", title: "Implementation", desc: "Hands-on delivery with documented patterns." },
+          { step: "04", title: "Knowledge Transfer", desc: "Enable your team to own and extend the platform." },
+          { step: "05", title: "Operational Readiness", desc: "Runbooks, monitoring, and handover validation." },
+        ].map((phase) => (
+          <li class="rounded-xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-blue-600">{phase.step}</p>
+            <h3 class="mt-1 text-sm font-semibold text-slate-950">{phase.title}</h3>
+            <p class="mt-1 text-xs text-slate-500">{phase.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="mt-10 flex flex-col items-start justify-between gap-5 rounded-xl border border-blue-100 bg-blue-50 p-7 sm:flex-row sm:items-center">
+        <div>
+          <h2 class="text-lg font-bold text-slate-950">Ready to get started?</h2>
+          <p class="mt-1 text-sm text-slate-600">Discuss your AWS and DevOps requirements.</p>
+        </div>
+        <a href="/contact.html" class="shrink-0 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 hover:text-white" style="text-decoration:none">Contact us</a>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

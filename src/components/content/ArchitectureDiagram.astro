@@ -1,0 +1,23 @@
+---
+interface Props {
+  title?: string;
+}
+const { title = "Reference architecture" } = Astro.props;
+---
+
+<figure class="card my-8 p-6">
+  <figcaption class="mb-4 text-sm text-slate-300">{title}</figcaption>
+  <svg viewBox="0 0 800 300" role="img" aria-label="Architecture flow diagram" class="w-full">
+    <rect x="10" y="40" width="180" height="90" rx="12" fill="#0f172a" stroke="#22d3ee" />
+    <text x="30" y="90" fill="#e2e8f0" font-size="14">Users / Teams</text>
+    <rect x="310" y="40" width="180" height="90" rx="12" fill="#0f172a" stroke="#22d3ee" />
+    <text x="332" y="90" fill="#e2e8f0" font-size="14">AWS Platform</text>
+    <rect x="610" y="40" width="180" height="90" rx="12" fill="#0f172a" stroke="#22d3ee" />
+    <text x="640" y="90" fill="#e2e8f0" font-size="14">Observability</text>
+    <line x1="190" y1="85" x2="310" y2="85" stroke="#67e8f9" stroke-width="2" />
+    <line x1="490" y1="85" x2="610" y2="85" stroke="#67e8f9" stroke-width="2" />
+    <rect x="310" y="170" width="180" height="90" rx="12" fill="#0f172a" stroke="#38bdf8" />
+    <text x="342" y="220" fill="#e2e8f0" font-size="14">Automation</text>
+    <line x1="400" y1="130" x2="400" y2="170" stroke="#67e8f9" stroke-width="2" />
+  </svg>
+</figure>

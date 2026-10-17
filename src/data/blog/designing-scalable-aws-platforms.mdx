@@ -1,0 +1,46 @@
+---
+title: Designing Scalable AWS Platforms for Multi-Team Delivery
+description: A practical architecture approach for scalability, security, and platform-team enablement.
+pubDate: 2026-03-15
+author: Nidhi Gupta
+category: Architecture
+tags:
+  - AWS
+  - Platform Engineering
+  - Kubernetes
+  - CI/CD
+image: /images/blog/scalable-platform.svg
+imageAlt: Scalable AWS platform reference
+featured: true
+draft: false
+readingTime: 9 min
+---
+
+import Callout from "../../components/content/Callout.astro";
+import ArchitectureDiagram from "../../components/content/ArchitectureDiagram.astro";
+import KeyTakeaways from "../../components/content/KeyTakeaways.astro";
+import YouTubeEmbed from "../../components/video/YouTubeEmbed.astro";
+import CodeComparison from "../../components/content/CodeComparison.astro";
+
+Platform engineering starts with reusable patterns and clear ownership boundaries.
+
+<Callout title="Design principle">
+Favor paved-road defaults that reduce variation without blocking team autonomy.
+</Callout>
+
+<ArchitectureDiagram title="Scalable AWS platform pattern" />
+
+<CodeComparison
+  before={`resource "aws_instance" "app" {\n  ami = var.ami\n  instance_type = "t3.large"\n}`}
+  after={`module "app_ec2" {\n  source = "../modules/ec2"\n  workload = "payments"\n  environment = var.environment\n}`}
+/>
+
+<KeyTakeaways
+  items={[
+    "Standard interfaces reduce operational load.",
+    "Security defaults should be embedded in templates.",
+    "Observability and backup controls belong in baseline modules.",
+  ]}
+/>
+
+<YouTubeEmbed youtubeId="dQw4w9WgXcQ" title="Scalable AWS Platforms" ratio="video" />

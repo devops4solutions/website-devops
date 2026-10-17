@@ -1,0 +1,59 @@
+---
+import "../styles/global.css";
+import Header from "../components/common/Header.astro";
+import Footer from "../components/common/Footer.astro";
+import SEOHead from "../components/common/SEOHead.astro";
+import { siteConfig } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  type?: "website" | "article" | "video.other";
+}
+
+const { title, description, canonicalUrl, ogImage, noindex = false, type = "website" } = Astro.props;
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Nidhi Gupta",
+  description: "Senior DevOps and cloud architecture professional",
+};
+
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: siteConfig.siteUrl,
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteConfig.name,
+  url: siteConfig.siteUrl,
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SEOHead title={title} description={description} canonicalUrl={canonicalUrl} ogImage={ogImage} noindex={noindex} type={type} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="DevOps4Solutions RSS" href="/rss.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)}></script>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <Header />
+    <main id="main-content" data-pagefind-body>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,45 @@
+---
+import { siteConfig } from "../../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  type?: "website" | "article" | "video.other";
+}
+
+const {
+  title = siteConfig.defaultTitle,
+  description = siteConfig.defaultDescription,
+  canonicalUrl,
+  ogImage = siteConfig.defaultSocialImage,
+  noindex = false,
+  type = "website",
+} = Astro.props;
+
+const site = Astro.site ?? new URL(siteConfig.siteUrl);
+const pageUrl = canonicalUrl ?? new URL(Astro.url.pathname, site).toString();
+const ogUrl = ogImage.startsWith("http") ? ogImage : new URL(ogImage, site).toString();
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={pageUrl} />
+<meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteConfig.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={pageUrl} />
+<meta property="og:image" content={ogUrl} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogUrl} />

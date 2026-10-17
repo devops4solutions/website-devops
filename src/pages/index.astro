@@ -1,0 +1,203 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/common/Container.astro";
+import Button from "../components/common/Button.astro";
+
+const allBlog = (await getCollection("blog") as CollectionEntry<"blog">[])
+	.filter((entry: CollectionEntry<"blog">) => !entry.data.draft)
+	.sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const allCaseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
+	.filter((entry: CollectionEntry<"caseStudies">) => !entry.data.draft)
+	.sort((a: CollectionEntry<"caseStudies">, b: CollectionEntry<"caseStudies">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const allVideos = (await getCollection("videos") as CollectionEntry<"videos">[])
+	.filter((entry: CollectionEntry<"videos">) => !entry.data.draft)
+	.sort((a: CollectionEntry<"videos">, b: CollectionEntry<"videos">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const featuredCaseStudies = allCaseStudies.filter((item: CollectionEntry<"caseStudies">) => item.data.featured).slice(0, 3);
+const technologies = [
+	"AWS",
+	"Terraform",
+	"Kubernetes",
+	"EKS",
+	"ECS",
+	"Fargate",
+	"GitHub Actions",
+	"Jenkins",
+	"CloudFront",
+	"S3",
+	"RDS",
+	"Aurora PostgreSQL",
+	"Systems Manager",
+	"CloudWatch",
+	"Splunk",
+];
+
+const serviceTiles = [
+	{
+		name: "AWS Cloud Architecture",
+		description: "Design highly available, secure, and cost-optimized AWS platforms aligned with enterprise scale and compliance.",
+		image: "/images/services/AWS-architect.png",
+	},
+	{
+		name: "Terraform & Infrastructure as Code",
+		description: "Build consistent, repeatable cloud environments using modular Terraform patterns and policy-driven automation.",
+		image: "/images/services/Terraform.png",
+	},
+	{
+		name: "Kubernetes & Amazon EKS",
+		description: "Run resilient container platforms on EKS with production-ready networking, security, and deployment standards.",
+		image: "/images/services/Kubernetes-Amazon-EKS.png",
+	},
+	{
+		name: "CI/CD Automation",
+		description: "Accelerate software delivery with reliable CI/CD pipelines using GitHub Actions, Jenkins, and AWS-native services.",
+		image: "/images/services/CICD-Automation.png",
+	},
+	{
+		name: "Enterprise Cloud Migration",
+		description: "Modernize legacy workloads through structured migration plans that minimize risk, downtime, and operational friction.",
+		image: "/images/services/Enterprise-Cloud-Migration.png",
+	},
+	{
+		name: "Observability & Patch Ops",
+		description: "Improve visibility, reliability, and security with end-to-end monitoring, alerting, and automated patch operations.",
+		image: "/images/services/Observability-Patch-Ops.png",
+	},
+];
+---
+
+<BaseLayout>
+	<!-- Hero -->
+	<section class="relative overflow-hidden border-b border-slate-200 bg-white py-16 sm:py-20">
+		<div class="pointer-events-none absolute inset-0" aria-hidden="true">
+			<img src="/images/hero/Designer.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-100" loading="lazy" decoding="async" />
+			<div class="absolute inset-0 bg-gradient-to-r from-white/92 via-white/80 to-white/70"></div>
+		</div>
+		<Container>
+			<div class="relative z-10 max-w-3xl">
+				<p class="eyebrow mb-3">Enterprise AWS &amp; DevOps</p>
+				<h1 class="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">Scalable Cloud Platforms,<br/>Built for Production</h1>
+				<p class="mt-5 max-w-xl text-lg text-slate-500">Transform complex cloud initiatives into reliable, production-ready platforms with expert AWS architecture, automation, and DevOps execution.</p>
+				<div class="mt-8 flex flex-wrap gap-3">
+					<Button href="/case-studies.html">Case Studies</Button>
+					<Button href="/services.html" variant="secondary">View Services</Button>
+				</div>
+			</div>
+		</Container>
+	</section>
+
+	<!-- Services snapshot -->
+	<section class="bg-slate-50 py-14">
+		<Container>
+			<div class="mb-8 flex items-end justify-between">
+				<h2 class="text-2xl font-bold text-slate-950">Services</h2>
+				<a href="/services.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+			</div>
+			<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+				{serviceTiles.map((service) => (
+					<a href="/services.html" class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+						<img
+							src={service.image}
+							alt={service.name}
+							loading="lazy"
+							decoding="async"
+							width="640"
+							height="360"
+							class="h-36 w-full object-cover"
+						/>
+						<div class="p-5">
+							<h3 class="text-base font-semibold text-slate-950 transition group-hover:text-blue-700">{service.name}</h3>
+							<p class="mt-2 text-sm leading-relaxed text-slate-600">{service.description}</p>
+							<p class="mt-4 text-sm font-medium text-blue-600">Learn more →</p>
+						</div>
+					</a>
+				))}
+			</div>
+		</Container>
+	</section>
+
+	<!-- Featured content (case studies + latest post) -->
+	<section class="section-shell bg-white py-14">
+		<Container>
+			<div class="grid gap-10 lg:grid-cols-[1.5fr_1fr]">
+				<!-- Left column: Latest Posts then Case Studies -->
+				<div class="space-y-10">
+					<div>
+						<div class="mb-4 flex items-end justify-between">
+							<h2 class="text-xl font-bold text-slate-950">Latest Posts</h2>
+							<a href="/blog.html" class="text-sm text-blue-600 hover:underline">All posts →</a>
+						</div>
+						<ul class="space-y-3">
+							{allBlog.slice(0, 3).map((post: CollectionEntry<"blog">) => (
+								<li>
+									<a href={`/blog/${post.id}.html`} class="block rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+										<p class="eyebrow">{post.data.category}</p>
+										<h3 class="mt-1 text-sm font-semibold text-slate-950">{post.data.title}</h3>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
+
+
+					<div>
+						<div class="mb-6 flex items-end justify-between">
+							<h2 class="text-2xl font-bold text-slate-950">Case Studies</h2>
+							<a href="/case-studies.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+						</div>
+						<div class="space-y-4">
+							{featuredCaseStudies.slice(0, 3).map((item: CollectionEntry<"caseStudies">) => (
+								<a href={`/case-studies/${item.id}.html`} class="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+									<div class="flex-1 min-w-0">
+										<p class="eyebrow">{item.data.industry ?? "General"}</p>
+										<h3 class="mt-1 text-sm font-semibold text-slate-950">{item.data.title}</h3>
+										<p class="mt-1 line-clamp-2 text-xs text-slate-500">{item.data.description}</p>
+									</div>
+									<span class="text-slate-300 text-lg">›</span>
+								</a>
+							))}
+						</div>
+					</div>
+				</div>
+
+				<!-- Right column: Videos (top) -->
+				<div>
+					<div>
+						<div class="mb-4 flex items-end justify-between">
+							<h2 class="text-xl font-bold text-slate-950">Videos</h2>
+							<a href="/videos.html" class="text-sm text-blue-600 hover:underline">All videos →</a>
+						</div>
+						<ul class="space-y-3">
+							{allVideos.slice(0, 2).map((video: CollectionEntry<"videos">) => (
+								<li>
+									<a href={`/videos/${video.id}.html`} class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+										<img src={`https://img.youtube.com/vi/${video.data.youtubeId}/default.jpg`} alt="" width="60" height="45" class="rounded-lg object-cover" loading="lazy" />
+										<div class="min-w-0">
+											<p class="eyebrow">{video.data.category}</p>
+											<h3 class="mt-0.5 text-sm font-semibold text-slate-950 leading-snug">{video.data.title}</h3>
+										</div>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</Container>
+	</section>
+
+	<!-- CTA strip -->
+	<section class="section-shell bg-slate-50 py-12">
+		<Container>
+			<div class="flex flex-col items-start justify-between gap-5 rounded-xl border border-blue-100 bg-blue-50 p-7 sm:flex-row sm:items-center">
+				<div>
+					<h2 class="text-xl font-bold text-slate-950">Need help designing or modernizing your AWS platform?</h2>
+					<p class="mt-1 text-sm text-slate-600">Architecture assessment, migration planning, or platform engineering support.</p>
+				</div>
+				<a href="/contact.html" class="shrink-0 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600 hover:text-white" style="text-decoration:none">Get in touch</a>
+			</div>
+		</Container>
+	</section>
+</BaseLayout>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://devops4solutions.com/sitemap-index.xml

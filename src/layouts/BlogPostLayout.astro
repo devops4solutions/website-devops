@@ -1,0 +1,46 @@
+---
+import ContentLayout from "./ContentLayout.astro";
+import BlogCard from "../components/content/BlogCard.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  related: CollectionEntry<"blog">[];
+  previous?: CollectionEntry<"blog">;
+  next?: CollectionEntry<"blog">;
+}
+
+const { post, related, previous, next } = Astro.props;
+---
+
+<ContentLayout
+  breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }, { label: post.data.title }]}
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  author={post.data.author}
+  heroImage={post.data.image}
+  heroImageAlt={post.data.imageAlt}
+  tags={post.data.tags}
+  category={post.data.category}
+>
+  {post.data.readingTime && <p class="mb-6 text-sm text-slate-500">Reading time: {post.data.readingTime}</p>}
+  <slot />
+
+  {(previous || next) && (
+    <nav aria-label="Post navigation" class="mt-10 grid gap-4 sm:grid-cols-2">
+      <div>{previous && <a class="card block p-4" href={`/blog/${previous.id}.html`}>← {previous.data.title}</a>}</div>
+      <div class="text-left sm:text-right">{next && <a class="card block p-4" href={`/blog/${next.id}.html`}>{next.data.title} →</a>}</div>
+    </nav>
+  )}
+
+  {related.length > 0 && (
+    <section class="mt-12">
+      <h2 class="mb-4 text-2xl font-semibold text-slate-950">Related articles</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        {related.map((item) => <BlogCard post={item} />)}
+      </div>
+    </section>
+  )}
+</ContentLayout>

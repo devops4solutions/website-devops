@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../../utils/content";
+import YouTubeEmbed from "./YouTubeEmbed.astro";
+
+interface Props {
+  video: CollectionEntry<"videos">;
+}
+
+const { video } = Astro.props;
+---
+
+<article class="space-y-4">
+  <YouTubeEmbed youtubeId={video.data.youtubeId} title={video.data.title} ratio={video.data.videoType === "short" ? "short" : "video"} />
+  <div>
+    <p class="eyebrow">{video.data.category}</p>
+    <h3 class="mt-1 text-lg font-semibold text-slate-950"><a class="no-underline hover:text-sky-700" href={`/videos/${video.id}.html`}>{video.data.title}</a></h3>
+    <p class="mt-2 text-sm text-slate-600">{video.data.description}</p>
+    <p class="mt-2 text-xs text-slate-500">{formatDate(video.data.pubDate)}{video.data.duration && ` • ${video.data.duration}`}</p>
+  </div>
+</article>

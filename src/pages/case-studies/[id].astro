@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CaseStudyLayout from "../../layouts/CaseStudyLayout.astro";
+import Container from "../../components/common/Container.astro";
+import CaseStudyCard from "../../components/content/CaseStudyCard.astro";
+import Button from "../../components/common/Button.astro";
+
+export async function getStaticPaths() {
+  const caseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
+    .filter((item: CollectionEntry<"caseStudies">) => !item.data.draft);
+
+  return caseStudies.map((item: CollectionEntry<"caseStudies">) => ({
+    params: { id: item.id },
+    props: { caseStudy: item, allCaseStudies: caseStudies },
+  }));
+}
+
+interface Props {
+  caseStudy: CollectionEntry<"caseStudies">;
+  allCaseStudies: CollectionEntry<"caseStudies">[];
+}
+
+const { caseStudy, allCaseStudies } = Astro.props;
+const { Content } = await render(caseStudy);
+
+const related = allCaseStudies
+  .filter((item: CollectionEntry<"caseStudies">) => item.id !== caseStudy.id)
+  .filter((item: CollectionEntry<"caseStudies">) =>
+    item.data.technologies.some((tech: string) => caseStudy.data.technologies.includes(tech)),
+  )
+  .slice(0, 3);
+---
+
+<BaseLayout title={`${caseStudy.data.title} | DevOps4Solutions`} description={caseStudy.data.description}>
+  <CaseStudyLayout caseStudy={caseStudy}>
+    <Content />
+  </CaseStudyLayout>
+
+  {related.length > 0 && (
+    <Container className="pb-10">
+      <h2 class="mb-4 text-2xl font-semibold text-slate-950">Related case studies</h2>
+      <div class="grid gap-4 md:grid-cols-3">
+        {related.map((item: CollectionEntry<"caseStudies">) => <CaseStudyCard item={item} />)}
+      </div>
+    </Container>
+  )}
+
+  <Container className="pb-16">
+    <div class="card p-6 text-center">
+      <h2 class="text-2xl font-semibold text-slate-950">Need a similar architecture review?</h2>
+      <div class="mt-4"><Button href="/contact.html">Book a Consultation</Button></div>
+    </div>
+  </Container>
+</BaseLayout>

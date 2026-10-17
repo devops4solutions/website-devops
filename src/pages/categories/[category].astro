@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
+import BlogCard from "../../components/content/BlogCard.astro";
+import { slugify } from "../../utils/content";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("blog") as CollectionEntry<"blog">[]).filter(
+    (post: CollectionEntry<"blog">) => !post.data.draft,
+  );
+
+  const categories = [...new Set(posts.map((post: CollectionEntry<"blog">) => post.data.category))];
+
+  return categories.map((category: string) => ({
+    params: { category: slugify(category) },
+    props: { category, posts },
+  }));
+}
+
+interface Props {
+  category: string;
+  posts: CollectionEntry<"blog">[];
+}
+
+const { category, posts } = Astro.props;
+
+const matches = posts
+  .filter((post: CollectionEntry<"blog">) => slugify(post.data.category) === slugify(category))
+  .sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+<BaseLayout title={`${category} Articles | DevOps4Solutions`} description={`Articles in ${category}.`}>
+  <ContentLayout
+    breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }, { label: "Categories" }, { label: category }]}
+    title={`Category: ${category}`}
+    description={`Articles tagged under ${category}.`}
+  >
+    <div class="grid gap-4 md:grid-cols-2">
+      {matches.map((post: CollectionEntry<"blog">) => <BlogCard post={post} />)}
+    </div>
+  </ContentLayout>
+</BaseLayout>

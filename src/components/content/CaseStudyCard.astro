@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../../utils/content";
+
+interface Props {
+  item: CollectionEntry<"caseStudies">;
+}
+
+const { item } = Astro.props;
+---
+
+<article class="card h-full p-6" data-industry={item.data.industry ?? "General"}>
+  <p class="eyebrow">{item.data.industry ?? "General"}</p>
+  <h3 class="mt-2 text-lg font-semibold text-slate-950">
+    <a href={`/case-studies/${item.id}.html`} class="no-underline hover:text-sky-700">{item.data.title}</a>
+  </h3>
+  <p class="mt-3 text-sm text-slate-600">{item.data.description}</p>
+  <p class="mt-3 text-xs text-slate-500">{formatDate(item.data.pubDate)}</p>
+  <ul class="mt-4 flex flex-wrap gap-2">
+    {item.data.technologies.slice(0, 4).map((tech) => (
+      <li class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-600">{tech}</li>
+    ))}
+  </ul>
+</article>

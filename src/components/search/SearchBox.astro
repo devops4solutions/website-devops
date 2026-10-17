@@ -1,0 +1,154 @@
+---
+interface SearchItem {
+  title: string;
+  url: string;
+  excerpt: string;
+  type: string;
+}
+
+interface Props {
+  fallbackItems?: SearchItem[];
+}
+
+const { fallbackItems = [] } = Astro.props;
+---
+
+<section class="card p-6 sm:p-8" aria-labelledby="search-heading">
+  <h2 id="search-heading" class="text-xl font-semibold text-slate-950">Search the site</h2>
+  <p class="mt-2 text-sm text-slate-600">Search blogs, case studies, videos, services, and about content.</p>
+
+  <form id="search-form" class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+    <div class="flex-1">
+      <label for="q" class="block text-sm font-medium text-slate-700">Search query</label>
+      <input id="q" type="search" class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900" placeholder="Search AWS, Terraform, EKS, migration..." />
+    </div>
+    <button type="submit" class="inline-flex h-[50px] items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-medium text-white">Search</button>
+  </form>
+
+  <p id="search-status" class="mt-3 text-sm text-slate-600" aria-live="polite"></p>
+  <ul id="results" class="mt-6 space-y-3"></ul>
+</section>
+
+<script id="search-fallback-data" type="application/json" set:html={JSON.stringify(fallbackItems)}></script>
+
+<script type="module" is:inline>
+  const form = document.querySelector("#search-form");
+  const queryInput = document.querySelector("#q");
+  const results = document.querySelector("#results");
+  const status = document.querySelector("#search-status");
+  const fallbackScript = document.querySelector("#search-fallback-data");
+
+  if (!(form instanceof HTMLFormElement) || !(queryInput instanceof HTMLInputElement) || !(results instanceof HTMLUListElement) || !(status instanceof HTMLElement)) {
+    throw new Error("Search UI missing");
+  }
+
+  const fallbackItems = fallbackScript?.textContent ? JSON.parse(fallbackScript.textContent) : [];
+  let pagefind;
+  let mode = "fallback";
+
+  const init = async () => {
+    try {
+      pagefind = await import(/* @vite-ignore */ "/pagefind/pagefind.js");
+      mode = "pagefind";
+      status.textContent = "Search is ready.";
+    } catch {
+      mode = "fallback";
+      status.textContent = "Using local search in development mode.";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("q")?.trim() ?? "";
+    if (query) {
+      queryInput.value = query;
+      runSearch(query);
+    }
+  };
+
+  const escapeHtml = (value) =>
+    value
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+  const renderResults = (items) => {
+    results.innerHTML = items
+      .map(
+        (item) => `<li><a class="block rounded-2xl border border-slate-200 bg-white p-4 no-underline shadow-sm transition hover:border-sky-300 hover:shadow-md" href="${item.url}"><h3 class="font-semibold text-slate-950">${escapeHtml(item.meta?.title || item.title || item.url)}</h3><p class="mt-1 text-sm text-slate-600">${item.excerpt || item.excerptHtml || ""}</p><p class="mt-2 text-xs font-medium uppercase tracking-wide text-sky-700">${escapeHtml(item.meta?.type || item.type || "page")}</p><p class="mt-1 text-xs text-slate-400">${escapeHtml(item.url)}</p></a></li>`,
+      )
+      .join("");
+  };
+
+  const stripHtml = (value) => value.replace(/<[^>]+>/g, "");
+
+  const runFallbackSearch = (value) => {
+    const terms = value.toLowerCase().split(/\s+/).filter(Boolean);
+    const matches = fallbackItems
+      .map((item) => {
+        const haystack = `${item.title} ${item.excerpt} ${item.type}`.toLowerCase();
+        const score = terms.reduce((total, term) => total + (haystack.includes(term) ? 1 : 0), 0);
+        return { ...item, score, meta: { title: item.title, type: item.type }, excerpt: item.excerpt };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 20);
+
+    if (!matches.length) {
+      results.innerHTML = "";
+      status.textContent = "No results found.";
+      return;
+    }
+
+    status.textContent = `${matches.length} result(s) found.`;
+    renderResults(matches);
+  };
+
+  const runSearch = async (value) => {
+    if (!value) {
+      results.innerHTML = "";
+      status.textContent = "Enter a query to begin.";
+      return;
+    }
+
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("q", value);
+    window.history.replaceState({}, "", nextUrl);
+
+    if (mode !== "pagefind" || !pagefind) {
+      runFallbackSearch(value);
+      return;
+    }
+
+    const search = await pagefind.search(value);
+    if (!search.results.length) {
+      results.innerHTML = "";
+      status.textContent = "No results found.";
+      return;
+    }
+
+    const data = await Promise.all(search.results.slice(0, 20).map((result) => result.data()));
+    const normalized = data.map((item) => ({
+      ...item,
+      excerpt: stripHtml(item.excerpt || ""),
+    }));
+    status.textContent = `${normalized.length} result(s) found.`;
+    renderResults(normalized);
+  };
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await runSearch(queryInput.value.trim());
+  });
+
+  queryInput.addEventListener("input", async () => {
+    if (!queryInput.value.trim()) {
+      results.innerHTML = "";
+      status.textContent = mode === "pagefind" ? "Search is ready." : "Using local search in development mode.";
+    }
+  });
+
+  queryInput.focus();
+
+  init();
+</script>

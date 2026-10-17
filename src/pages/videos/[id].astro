@@ -1,0 +1,86 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
+import Container from "../../components/common/Container.astro";
+import VideoCard from "../../components/video/VideoCard.astro";
+
+export async function getStaticPaths() {
+  const videos = (await getCollection("videos") as CollectionEntry<"videos">[])
+    .filter((video: CollectionEntry<"videos">) => !video.data.draft)
+    .sort((a: CollectionEntry<"videos">, b: CollectionEntry<"videos">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+  return videos.map((video: CollectionEntry<"videos">) => ({
+    params: { id: video.id },
+    props: { video, videos },
+  }));
+}
+
+interface Props {
+  video: CollectionEntry<"videos">;
+  videos: CollectionEntry<"videos">[];
+}
+
+const { video, videos } = Astro.props;
+const { Content } = await render(video);
+
+const related = videos
+  .filter((item: CollectionEntry<"videos">) => item.id !== video.id)
+  .filter((item: CollectionEntry<"videos">) =>
+    item.data.tags.some((tag: string) => video.data.tags.includes(tag)),
+  )
+  .slice(0, 3);
+
+const videoUrl = `https://www.youtube.com/watch?v=${video.data.youtubeId}`;
+const pageUrl = new URL(`/videos/${video.id}.html`, Astro.site).toString();
+const thumb = `https://img.youtube.com/vi/${video.data.youtubeId}/hqdefault.jpg`;
+
+const videoSchema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: video.data.title,
+  description: video.data.description,
+  uploadDate: video.data.pubDate.toISOString(),
+  thumbnailUrl: thumb,
+  embedUrl: `https://www.youtube-nocookie.com/embed/${video.data.youtubeId}`,
+  contentUrl: videoUrl,
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: new URL("/", Astro.site).toString() },
+    { "@type": "ListItem", position: 2, name: "Videos", item: new URL("/videos.html", Astro.site).toString() },
+    { "@type": "ListItem", position: 3, name: video.data.title, item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout title={`${video.data.title} | DevOps4Solutions`} description={video.data.description} canonicalUrl={pageUrl} type="video.other" ogImage={thumb}>
+  <ContentLayout
+    breadcrumbs={[{ label: "Home", href: "/" }, { label: "Videos", href: "/videos.html" }, { label: video.data.title }]}
+    title={video.data.title}
+    description={video.data.description}
+    pubDate={video.data.pubDate}
+    tags={video.data.tags}
+    category={video.data.category}
+  >
+    <VideoCard video={video} />
+    <p class="mt-4 text-sm text-slate-500"><a href={videoUrl} target="_blank" rel="noreferrer">Open on YouTube (no JavaScript fallback)</a></p>
+    <Content />
+  </ContentLayout>
+
+  {related.length > 0 && (
+    <Container className="pb-16">
+      <h2 class="mb-4 text-2xl font-semibold text-slate-950">Related videos</h2>
+      <div class="grid gap-6 md:grid-cols-3">
+        {related.map((item: CollectionEntry<"videos">) => <VideoCard video={item} />)}
+      </div>
+    </Container>
+  )}
+
+  <script type="application/ld+json" set:html={JSON.stringify(videoSchema)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
+</BaseLayout>

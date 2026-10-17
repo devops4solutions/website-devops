@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/common/Container.astro";
+import SearchBox from "../../components/search/SearchBox.astro";
+
+const blog = (await getCollection("blog") as CollectionEntry<"blog">[])
+  .filter((item: CollectionEntry<"blog">) => !item.data.draft)
+  .map((item: CollectionEntry<"blog">) => ({
+    title: item.data.title,
+    url: `/blog/${item.id}.html`,
+    excerpt: item.data.description,
+    type: "Blog",
+  }));
+
+const caseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
+  .filter((item: CollectionEntry<"caseStudies">) => !item.data.draft)
+  .map((item: CollectionEntry<"caseStudies">) => ({
+    title: item.data.title,
+    url: `/case-studies/${item.id}.html`,
+    excerpt: item.data.description,
+    type: "Case Study",
+  }));
+
+const videos = (await getCollection("videos") as CollectionEntry<"videos">[])
+  .filter((item: CollectionEntry<"videos">) => !item.data.draft)
+  .map((item: CollectionEntry<"videos">) => ({
+    title: item.data.title,
+    url: `/videos/${item.id}.html`,
+    excerpt: item.data.description,
+    type: item.data.videoType === "short" ? "Short" : "Video",
+  }));
+
+const staticPages = [
+  {
+    title: "Services",
+    url: "/services.html",
+    excerpt: "AWS architecture, migration, Terraform modules, Kubernetes, CI/CD, security, observability, and cost optimization.",
+    type: "Page",
+  },
+  {
+    title: "About Nidhi Gupta",
+    url: "/about.html",
+    excerpt: "Senior DevOps and cloud architecture experience with a focus on enterprise AWS, infrastructure automation, and technical education.",
+    type: "Page",
+  },
+  {
+    title: "Contact",
+    url: "/contact.html",
+    excerpt: "Reach out for architecture reviews, migration planning, DevOps modernization, and platform engineering support.",
+    type: "Page",
+  },
+];
+
+const fallbackItems = [...blog, ...caseStudies, ...videos, ...staticPages];
+---
+
+<BaseLayout title="Search | DevOps4Solutions" description="Search all content.">
+  <Container className="py-14">
+    <h1 class="mb-3 text-3xl font-semibold text-slate-950">Search</h1>
+    <p class="mb-6 max-w-2xl text-slate-600">Use search to find technical articles, case studies, videos, and core service pages.</p>
+    <SearchBox fallbackItems={fallbackItems} />
+  </Container>
+</BaseLayout>

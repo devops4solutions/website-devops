@@ -1,0 +1,23 @@
+---
+import { siteConfig } from "../../data/site";
+import Button from "./Button.astro";
+---
+
+<details class="md:hidden">
+  <summary class="cursor-pointer list-none rounded-full border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700">
+    Menu
+  </summary>
+  <nav aria-label="Mobile Navigation" class="mt-3 space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/60">
+    <ul class="space-y-2">
+      {siteConfig.navigation.map((item) => (
+        <li>
+          <a href={item.href} class="block rounded-lg px-2 py-2 text-slate-700 no-underline hover:bg-slate-50 hover:text-slate-950">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-3 flex gap-2">
+      <Button href="/search.html" variant="secondary">Search</Button>
+      <Button href="/contact.html">Book a Consultation</Button>
+    </div>
+  </nav>
+</details>
