@@ -8,10 +8,12 @@ export const features = {
   learn: false,
   /** /consulting.html with session types and Cal.com booking (roadmap 1.3). */
   consulting: true,
-  /** /project-request.html form posting to /api/project-request (roadmap 1.5). */
-  projectRequest: false,
-  /** /pay.html with invoice and Payment Link instructions (roadmap 1.7). */
+  /** /hire-me.html project request form (needs `hireMe.web3formsAccessKey` below). */
+  hireMe: false,
+  /** /pay.html: how invoices are paid, plus fixed-price Stripe Payment Links. */
   pay: false,
+  /** Show Razorpay Payment Links (UPI) next to the Stripe ones on /pay.html. */
+  razorpay: false,
   /** /legal/terms.html, /legal/refunds.html and /legal/cookies.html (roadmap 1.16). */
   legal: false,
 } as const;
@@ -54,6 +56,47 @@ export const siteConfig = {
   postsPerPage: 9,
   /** X (Twitter) handle for the twitter:site meta tag, e.g. "@devops4solutions". Leave empty if none. */
   xHandle: "",
+  /**
+   * Project request form on /hire-me.html, submitted directly to Web3Forms (no server code here).
+   * The access key is public by design: it only lets this form send email to the address you
+   * registered at web3forms.com. Leave empty until you have one; the page then offers email instead.
+   */
+  hireMe: {
+    formEndpoint: "https://api.web3forms.com/submit",
+    web3formsAccessKey: "",
+    /** File upload input. Web3Forms attachments need a paid (Pro) plan; when false a "link to files" field is shown instead. */
+    attachments: false,
+    /** Web3Forms' free hCaptcha. Enable "hCaptcha" in the Web3Forms dashboard too. */
+    hcaptcha: false,
+    projectTypes: [
+      "AWS migration",
+      "Landing zone / multi-account setup",
+      "Terraform / Infrastructure as Code",
+      "Kubernetes / Amazon EKS",
+      "CI/CD pipelines",
+      "Observability & patch automation",
+      "Cost optimisation",
+      "Architecture review",
+      "Other",
+    ],
+    budgets: ["Under $5k", "$5k – $15k", "$15k – $50k", "$50k+", "Not sure yet"],
+    timelines: ["As soon as possible", "Within a month", "1 – 3 months", "3+ months", "Flexible"],
+    platforms: ["AWS", "Azure", "Google Cloud", "Hybrid / on-premises", "Multi-cloud", "Not sure yet"],
+  },
+  /**
+   * Fixed-price Payment Links shown on /pay.html. Create them in the Stripe / Razorpay dashboards
+   * and paste the URLs here. Entries with an empty `url` are hidden. No card data touches this site.
+   */
+  payments: {
+    stripe: [
+      { label: "Architecture deep dive (60 min)", price: "", description: "Single paid session.", url: "" },
+      { label: "Project deposit", price: "", description: "Deposit to book a project start date.", url: "" },
+    ],
+    /** Shown only when `features.razorpay` is on (UPI and Indian cards). */
+    razorpay: [
+      { label: "Architecture deep dive (60 min)", price: "", description: "Pay with UPI or Indian cards.", url: "" },
+    ],
+  },
   /** Cal.com embed. Change only if you self-host Cal.com. Event links live in src/data/sessions.yaml. */
   cal: {
     origin: "https://cal.com",
@@ -73,7 +116,7 @@ export const headerNav: NavLink[] = [
   { label: "Blog", href: "/blog.html" },
   { label: "Learn", href: "/learn.html", requires: "learn" },
   { label: "Consulting", href: "/consulting.html", requires: "consulting" },
-  { label: "Hire me for a project", href: "/project-request.html", requires: "projectRequest" },
+  { label: "Hire me for a project", href: "/hire-me.html", requires: "hireMe" },
   { label: "About", href: "/about.html" },
 ];
 
@@ -98,7 +141,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
       { label: "Services", href: "/services.html" },
       { label: "Case studies", href: "/case-studies.html" },
       { label: "Consulting", href: "/consulting.html", requires: "consulting" },
-      { label: "Hire me for a project", href: "/project-request.html", requires: "projectRequest" },
+      { label: "Hire me for a project", href: "/hire-me.html", requires: "hireMe" },
       { label: "Pay an invoice", href: "/pay.html", requires: "pay" },
       { label: "Contact", href: "/contact.html" },
     ],

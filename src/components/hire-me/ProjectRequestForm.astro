@@ -1,0 +1,343 @@
+---
+// Project request form. Posts directly to Web3Forms (siteConfig.hireMe); there is no server code on this site.
+// With JavaScript: client-side validation, submission via fetch, then redirect to the thank-you page.
+// Without JavaScript: native validation and a normal POST; Web3Forms redirects to the thank-you page.
+import { siteConfig } from "../../config/site";
+
+const config = siteConfig.hireMe;
+const thanksUrl = `${siteConfig.siteUrl}/hire-me/thanks.html`;
+const MAX_FILE_MB = 5;
+
+const inputClass =
+  "mt-2 block min-h-11 w-full rounded-lg border border-border bg-surface px-3 text-base text-ink shadow-sm aria-[invalid=true]:border-red-600 focus-visible:outline-2 focus-visible:outline-focus";
+const labelClass = "block text-sm font-semibold text-ink";
+const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
+---
+
+<form
+  id="project-request"
+  class="space-y-7"
+  action={config.formEndpoint}
+  method="POST"
+  enctype={config.attachments ? "multipart/form-data" : undefined}
+  data-endpoint={config.formEndpoint}
+  data-configured={config.web3formsAccessKey ? "true" : "false"}
+  data-thanks="/hire-me/thanks.html"
+  data-max-file-mb={MAX_FILE_MB}
+>
+  <!-- Web3Forms settings -->
+  <input type="hidden" name="access_key" value={config.web3formsAccessKey} />
+  <input type="hidden" name="subject" value="New project request from devops4solutions.com" />
+  <input type="hidden" name="from_name" value="DevOps4Solutions website" />
+  <input type="hidden" name="redirect" value={thanksUrl} />
+  <!-- Honeypot: real visitors never see or tick this; submissions with it ticked are discarded. -->
+  <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div data-error-summary class="rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800" role="alert" tabindex="-1" hidden>
+    <p class="font-semibold">Please fix the following:</p>
+    <ul class="mt-2 list-disc space-y-1 pl-5"></ul>
+  </div>
+
+  <fieldset aria-describedby="types-hint types-error">
+    <legend class={labelClass}>What do you need help with? <span class="text-red-700" aria-hidden="true">*</span></legend>
+    <p id="types-hint" class="mt-1 text-sm text-muted">Choose all that apply.</p>
+    <div class="mt-3 flex flex-wrap gap-2" data-field="types">
+      {config.projectTypes.map((type) => (
+        <label class="cursor-pointer">
+          <input type="checkbox" name="Project type" value={type} class="peer sr-only" />
+          <span class="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-medium text-ink-soft transition select-none peer-checked:border-primary peer-checked:bg-primary-soft peer-checked:text-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus hover:border-primary-border">
+            <svg aria-hidden="true" viewBox="0 0 20 20" class="hidden size-4 [.peer:checked~span_&]:block" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z"></path></svg>
+            {type}
+          </span>
+        </label>
+      ))}
+    </div>
+    <p id="types-error" class={errorClass} hidden></p>
+  </fieldset>
+
+  <div class="grid gap-6 sm:grid-cols-3">
+    <div>
+      <label for="budget" class={labelClass}>Budget <span class="text-red-700" aria-hidden="true">*</span></label>
+      <select id="budget" name="Budget" required class={inputClass} aria-describedby="budget-error">
+        <option value="">Select…</option>
+        {config.budgets.map((option) => <option>{option}</option>)}
+      </select>
+      <p id="budget-error" class={errorClass} hidden></p>
+    </div>
+    <div>
+      <label for="timeline" class={labelClass}>Timeline <span class="text-red-700" aria-hidden="true">*</span></label>
+      <select id="timeline" name="Timeline" required class={inputClass} aria-describedby="timeline-error">
+        <option value="">Select…</option>
+        {config.timelines.map((option) => <option>{option}</option>)}
+      </select>
+      <p id="timeline-error" class={errorClass} hidden></p>
+    </div>
+    <div>
+      <label for="platform" class={labelClass}>Cloud / platform <span class="text-red-700" aria-hidden="true">*</span></label>
+      <select id="platform" name="Cloud platform" required class={inputClass} aria-describedby="platform-error">
+        <option value="">Select…</option>
+        {config.platforms.map((option) => <option>{option}</option>)}
+      </select>
+      <p id="platform-error" class={errorClass} hidden></p>
+    </div>
+  </div>
+
+  <div>
+    <label for="description" class={labelClass}>Project description <span class="text-red-700" aria-hidden="true">*</span></label>
+    <p id="description-hint" class="mt-1 text-sm text-muted">Goal, current setup, constraints and what success looks like. Please don't include passwords or secrets.</p>
+    <textarea id="description" name="message" required minlength="30" rows="6" class={`${inputClass} py-2`} aria-describedby="description-hint description-error"></textarea>
+    <p id="description-error" class={errorClass} hidden></p>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <label for="name" class={labelClass}>Your name <span class="text-red-700" aria-hidden="true">*</span></label>
+      <input id="name" name="name" type="text" required autocomplete="name" class={inputClass} aria-describedby="name-error" />
+      <p id="name-error" class={errorClass} hidden></p>
+    </div>
+    <div>
+      <label for="email" class={labelClass}>Work email <span class="text-red-700" aria-hidden="true">*</span></label>
+      <input id="email" name="email" type="email" required autocomplete="email" inputmode="email" class={inputClass} aria-describedby="email-error" />
+      <p id="email-error" class={errorClass} hidden></p>
+    </div>
+  </div>
+
+  {config.attachments ? (
+    <div>
+      <label for="attachment" class={labelClass}>Attachment <span class="font-normal text-muted">(optional)</span></label>
+      <p id="attachment-hint" class="mt-1 text-sm text-muted">One file up to {MAX_FILE_MB} MB: PDF, image, Word, or ZIP.</p>
+      <input
+        id="attachment"
+        name="attachment"
+        type="file"
+        accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.zip"
+        class="mt-2 block w-full text-sm text-ink-soft file:mr-4 file:min-h-11 file:rounded-full file:border-0 file:bg-primary-soft file:px-4 file:font-semibold file:text-primary"
+        aria-describedby="attachment-hint attachment-error"
+      />
+      <p id="attachment-error" class={errorClass} hidden></p>
+    </div>
+  ) : (
+    <div>
+      <label for="files" class={labelClass}>Link to files <span class="font-normal text-muted">(optional)</span></label>
+      <p id="files-hint" class="mt-1 text-sm text-muted">Diagrams or documents shared via Google Drive, Dropbox, OneDrive or GitHub.</p>
+      <input id="files" name="Files link" type="url" inputmode="url" placeholder="https://" class={inputClass} aria-describedby="files-hint files-error" />
+      <p id="files-error" class={errorClass} hidden></p>
+    </div>
+  )}
+
+  <label class="flex cursor-pointer items-start gap-3 rounded-card border border-border bg-surface-muted p-4">
+    <input type="checkbox" name="NDA requested" value="Yes" class="mt-0.5 size-5 shrink-0 accent-primary" />
+    <span class="text-sm text-ink">
+      <span class="font-semibold">I'd like an NDA before sharing details.</span>
+      <span class="block text-ink-soft">I'll send one for signature before we discuss specifics.</span>
+    </span>
+  </label>
+
+  {config.hcaptcha && <div class="h-captcha" data-captcha="true"></div>}
+
+  <div data-submit-error class="rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800" role="alert" tabindex="-1" hidden></div>
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button
+      type="submit"
+      class="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-7 text-base font-semibold text-white transition hover:bg-primary-hover disabled:cursor-wait disabled:opacity-70"
+    >
+      <span data-submit-label>Send project request</span>
+    </button>
+    <p class="text-xs text-muted">
+      Sent to {siteConfig.author.name} by email via Web3Forms and used only to reply. See the <a href="/privacy.html">privacy policy</a>.
+    </p>
+  </div>
+</form>
+
+{config.hcaptcha && <script is:inline src="https://web3forms.com/client/script.js" async defer></script>}
+
+<script>
+  import { siteConfig } from "../../config/site";
+  import { track } from "../../lib/analytics/track";
+
+  const form = document.querySelector<HTMLFormElement>("#project-request");
+
+  if (form) {
+    // JavaScript validation replaces the browser's own bubbles so every error is shown at once.
+    form.noValidate = true;
+    const summary = form.querySelector<HTMLElement>("[data-error-summary]")!;
+    const submitError = form.querySelector<HTMLElement>("[data-submit-error]")!;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const buttonLabel = form.querySelector<HTMLElement>("[data-submit-label]")!;
+    const maxFileBytes = Number(form.dataset.maxFileMb ?? 5) * 1024 * 1024;
+    let attempted = false;
+
+    type Check = { id: string; label: string; focus: () => HTMLElement | null; validate: () => string };
+    const field = <T extends HTMLElement>(id: string) => form.querySelector<T>(`#${id}`);
+    const value = (id: string) => (field<HTMLInputElement>(id)?.value ?? "").trim();
+
+    const checks: Check[] = [
+      {
+        id: "types",
+        label: "Project type",
+        focus: () => form.querySelector('input[name="Project type"]'),
+        validate: () => (form.querySelectorAll('input[name="Project type"]:checked').length ? "" : "Choose at least one project type."),
+      },
+      { id: "budget", label: "Budget", focus: () => field("budget"), validate: () => (value("budget") ? "" : "Select a budget range.") },
+      { id: "timeline", label: "Timeline", focus: () => field("timeline"), validate: () => (value("timeline") ? "" : "Select a timeline.") },
+      { id: "platform", label: "Cloud / platform", focus: () => field("platform"), validate: () => (value("platform") ? "" : "Select a cloud or platform.") },
+      {
+        id: "description",
+        label: "Project description",
+        focus: () => field("description"),
+        validate: () => {
+          const length = value("description").length;
+          if (!length) return "Describe the project.";
+          return length < 30 ? `Add a little more detail (at least 30 characters, ${length} so far).` : "";
+        },
+      },
+      { id: "name", label: "Your name", focus: () => field("name"), validate: () => (value("name") ? "" : "Enter your name.") },
+      {
+        id: "email",
+        label: "Work email",
+        focus: () => field("email"),
+        validate: () => {
+          const email = value("email");
+          if (!email) return "Enter your work email.";
+          return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? "" : "Enter a valid email address, like name@company.com.";
+        },
+      },
+      {
+        id: "files",
+        label: "Link to files",
+        focus: () => field("files"),
+        validate: () => {
+          const url = value("files");
+          if (!url || !field("files")) return "";
+          try {
+            return ["http:", "https:"].includes(new URL(url).protocol) ? "" : "Enter a link starting with https://.";
+          } catch {
+            return "Enter a full link starting with https://.";
+          }
+        },
+      },
+      {
+        id: "attachment",
+        label: "Attachment",
+        focus: () => field("attachment"),
+        validate: () => {
+          const file = field<HTMLInputElement>("attachment")?.files?.[0];
+          return file && file.size > maxFileBytes ? `The file is too large (max ${form.dataset.maxFileMb} MB).` : "";
+        },
+      },
+    ];
+
+    const showError = (check: Check, message: string) => {
+      const error = form.querySelector<HTMLElement>(`#${check.id}-error`);
+      const target = check.id === "types" ? form.querySelector<HTMLElement>("fieldset") : field(check.id);
+      if (error) {
+        error.textContent = message;
+        error.hidden = !message;
+      }
+      if (check.id === "types") {
+        form.querySelectorAll('input[name="Project type"]').forEach((input) => input.setAttribute("aria-invalid", String(!!message)));
+      } else {
+        target?.setAttribute("aria-invalid", String(!!message));
+      }
+    };
+
+    const validateAll = () => {
+      const failures = checks.map((check) => ({ check, message: check.validate() }));
+      failures.forEach(({ check, message }) => showError(check, message));
+      return failures.filter(({ message }) => message);
+    };
+
+    const renderSummary = (failures: { check: Check; message: string }[]) => {
+      const list = summary.querySelector("ul")!;
+      list.innerHTML = "";
+      for (const { check, message } of failures) {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `#${check.id === "types" ? "types-hint" : check.id}`;
+        link.textContent = `${check.label}: ${message}`;
+        link.className = "text-red-800 underline";
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          check.focus()?.focus();
+        });
+        item.append(link);
+        list.append(item);
+      }
+      summary.hidden = failures.length === 0;
+    };
+
+    // After the first attempt, re-check fields as the visitor fixes them.
+    form.addEventListener("input", () => attempted && renderSummary(validateAll()));
+    form.addEventListener("change", () => attempted && renderSummary(validateAll()));
+
+    const mailtoFallback = () => {
+      const data = new FormData(form);
+      const types = data.getAll("Project type").join(", ");
+      const body = [
+        `Project type: ${types}`,
+        `Budget: ${data.get("Budget") ?? ""}`,
+        `Timeline: ${data.get("Timeline") ?? ""}`,
+        `Cloud / platform: ${data.get("Cloud platform") ?? ""}`,
+        `NDA requested: ${data.get("NDA requested") ? "Yes" : "No"}`,
+        "",
+        String(data.get("message") ?? ""),
+        "",
+        `${data.get("name") ?? ""}`,
+      ].join("\n");
+      return `mailto:${siteConfig.email}?subject=${encodeURIComponent("Project request")}&body=${encodeURIComponent(body)}`;
+    };
+
+    const fail = (message: string) => {
+      submitError.innerHTML = "";
+      const text = document.createElement("p");
+      text.textContent = message;
+      const link = document.createElement("a");
+      link.href = mailtoFallback();
+      link.textContent = "Send it by email instead";
+      link.className = "mt-2 inline-block py-1 font-semibold text-red-800 underline";
+      submitError.append(text, link);
+      submitError.hidden = false;
+      submitError.focus();
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      attempted = true;
+      submitError.hidden = true;
+      const failures = validateAll();
+      renderSummary(failures);
+      if (failures.length) {
+        summary.focus();
+        summary.scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      }
+
+      if (form.dataset.configured !== "true") {
+        fail("The online form isn't set up yet. Your details are still here, so you can send them by email.");
+        return;
+      }
+
+      const data = new FormData(form);
+      // Send the selected project types as one readable line instead of repeated fields.
+      const types = data.getAll("Project type").join(", ");
+      data.delete("Project type");
+      data.set("Project type", types);
+      if (!data.get("NDA requested")) data.set("NDA requested", "No");
+
+      button.disabled = true;
+      buttonLabel.textContent = "Sending…";
+      try {
+        const response = await fetch(form.dataset.endpoint!, { method: "POST", body: data, headers: { Accept: "application/json" } });
+        const result = (await response.json().catch(() => ({}))) as { success?: boolean; message?: string };
+        if (!response.ok || !result.success) throw new Error(result.message || `HTTP ${response.status}`);
+        track("Project request sent", { types, budget: String(data.get("Budget") ?? "") });
+        window.location.assign(form.dataset.thanks!);
+      } catch (error) {
+        button.disabled = false;
+        buttonLabel.textContent = "Send project request";
+        fail(`Sorry, your request couldn't be sent (${(error as Error).message}). Please try again in a moment, or email it instead.`);
+      }
+    });
+  }
+</script>
