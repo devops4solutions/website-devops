@@ -1,0 +1,40 @@
+---
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  /** URL of page n (page 1 is the section's main URL). */
+  urlFor: (page: number) => string;
+  label?: string;
+}
+
+const { currentPage, lastPage, urlFor, label = "Pagination" } = Astro.props;
+const pages = Array.from({ length: lastPage }, (_, i) => i + 1);
+const linkClass =
+  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-ink-soft no-underline hover:border-primary-border hover:text-primary hover:no-underline";
+---
+
+{lastPage > 1 && (
+  <nav aria-label={label} class="mt-10 flex flex-wrap items-center justify-between gap-3" data-pagefind-ignore>
+    {currentPage > 1 ? (
+      <a href={urlFor(currentPage - 1)} rel="prev" class={linkClass}>← Newer</a>
+    ) : <span></span>}
+
+    <!-- Page numbers on wider screens; "Page x of y" on phones. -->
+    <ol class="hidden items-center gap-2 sm:flex">
+      {pages.map((page) => (
+        <li>
+          {page === currentPage ? (
+            <span aria-current="page" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white">{page}</span>
+          ) : (
+            <a href={urlFor(page)} class={linkClass} aria-label={`Page ${page}`}>{page}</a>
+          )}
+        </li>
+      ))}
+    </ol>
+    <p class="text-sm text-muted sm:hidden">Page {currentPage} of {lastPage}</p>
+
+    {currentPage < lastPage ? (
+      <a href={urlFor(currentPage + 1)} rel="next" class={linkClass}>Older →</a>
+    ) : <span></span>}
+  </nav>
+)}

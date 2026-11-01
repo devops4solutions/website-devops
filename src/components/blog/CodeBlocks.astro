@@ -1,0 +1,62 @@
+---
+// Adds a language label and a copy button to every highlighted code block in `.prose-content`.
+// Client-side enhancement: without JavaScript the code blocks still render normally.
+---
+
+<script>
+  import { track } from "../../lib/analytics/track";
+
+  const LANGUAGE_NAMES: Record<string, string> = {
+    bash: "Bash", sh: "Shell", shell: "Shell", zsh: "Shell", console: "Console", powershell: "PowerShell",
+    terraform: "Terraform", hcl: "HCL", yaml: "YAML", yml: "YAML", json: "JSON", jsonc: "JSON",
+    js: "JavaScript", javascript: "JavaScript", ts: "TypeScript", typescript: "TypeScript",
+    python: "Python", py: "Python", go: "Go", dockerfile: "Dockerfile", docker: "Dockerfile",
+    sql: "SQL", html: "HTML", css: "CSS", ini: "INI", toml: "TOML", groovy: "Groovy",
+    text: "Text", plaintext: "Text",
+  };
+
+  // The async clipboard API needs HTTPS (or localhost); without it the label still shows, just no button.
+  const canCopy = typeof navigator.clipboard?.writeText === "function";
+
+  for (const pre of document.querySelectorAll<HTMLPreElement>(".prose-content pre[data-language]")) {
+    if (pre.parentElement?.classList.contains("code-block")) continue;
+    const lang = pre.dataset.language ?? "text";
+    const name = LANGUAGE_NAMES[lang] ?? lang.toUpperCase();
+
+    const figure = document.createElement("figure");
+    figure.className = "code-block";
+    const bar = document.createElement("figcaption");
+    bar.className = "code-block__bar";
+    const label = document.createElement("span");
+    label.className = "code-block__lang";
+    label.textContent = name;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-block__copy";
+    button.textContent = "Copy";
+    button.setAttribute("aria-label", `Copy ${name} code`);
+    const status = document.createElement("span");
+    status.className = "sr-only";
+    status.setAttribute("aria-live", "polite");
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(pre.querySelector("code")?.innerText ?? pre.innerText);
+        button.textContent = "Copied";
+        status.textContent = `${name} code copied to clipboard`;
+        track("Copy code", { language: lang, page: location.pathname });
+      } catch {
+        button.textContent = "Failed";
+      }
+      setTimeout(() => {
+        button.textContent = "Copy";
+        status.textContent = "";
+      }, 2000);
+    });
+
+    bar.append(label);
+    if (canCopy) bar.append(button, status);
+    pre.replaceWith(figure);
+    figure.append(bar, pre);
+  }
+</script>

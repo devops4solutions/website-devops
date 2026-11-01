@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
@@ -37,6 +37,19 @@ export default defineConfig({
 			serialize: (item) => ({ ...item, url: toPublishedUrl(item.url) }),
 		}),
 	],
+	env: {
+		// All optional: the site builds without them, and each feature switches itself off when its variables are missing.
+		schema: {
+			PUBLIC_GISCUS_REPO: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_GISCUS_REPO_ID: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_GISCUS_CATEGORY: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_GISCUS_CATEGORY_ID: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_PLAUSIBLE_DOMAIN: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_PLAUSIBLE_SCRIPT_URL: envField.string({ context: "client", access: "public", optional: true, default: "https://plausible.io/js/script.js" }),
+			PUBLIC_UMAMI_WEBSITE_ID: envField.string({ context: "client", access: "public", optional: true }),
+			PUBLIC_UMAMI_SCRIPT_URL: envField.string({ context: "client", access: "public", optional: true }),
+		},
+	},
 	vite: {
 		plugins: [tailwindcss()],
 	},

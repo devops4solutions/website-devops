@@ -2,6 +2,7 @@
 import Container from "./Container.astro";
 import MobileMenu from "./MobileMenu.astro";
 import Button from "./Button.astro";
+import SearchDialog from "../search/SearchDialog.astro";
 import { bookCallLink, headerNav, siteConfig, visibleLinks } from "../../config/site";
 
 const links = visibleLinks(headerNav);
@@ -38,6 +39,8 @@ const isActive = (href: string) => currentPath === href || currentPath.startsWit
         <a
           href="/search.html"
           aria-label="Search"
+          aria-haspopup="dialog"
+          data-search-open
           class="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-primary-border bg-surface text-primary transition hover:border-primary hover:text-primary-hover sm:size-10"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -47,10 +50,12 @@ const isActive = (href: string) => currentPath === href || currentPath.startsWit
         </a>
         <!-- On phones the call-to-action lives in the menu, so the header never overflows. -->
         <div class="hidden sm:block">
-          <Button href={bookCallLink.href} size="sm" class="whitespace-nowrap">{bookCallLink.label}</Button>
+          <Button href={bookCallLink.href} size="sm" class="whitespace-nowrap" trackEvent="Book a call" trackLocation="header">{bookCallLink.label}</Button>
         </div>
         <MobileMenu links={links} currentPath={currentPath} />
       </div>
     </div>
   </Container>
 </header>
+
+<SearchDialog />

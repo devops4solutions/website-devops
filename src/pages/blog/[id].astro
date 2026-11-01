@@ -5,6 +5,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import BlogPostLayout from "../../layouts/BlogPostLayout.astro";
 import { getPublishedPosts } from "../../lib/content/queries";
 import { articleSchema, breadcrumbSchema } from "../../lib/seo/schema";
+import { editUrl, readingTime, relatedPosts } from "../../lib/content/blog";
+import { siteConfig } from "../../config/site";
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -28,11 +30,10 @@ interface Props {
 }
 
 const { post, previous, next, allPosts } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
-const related = allPosts
-  .filter((item) => item.id !== post.id && item.data.tags.some((tag) => post.data.tags.includes(tag)))
-  .slice(0, 3);
+// Skip the newer/older posts: they are already linked right above "Related posts".
+const related = relatedPosts(post, allPosts.filter((item) => item.id !== previous?.id && item.id !== next?.id));
 
 const canonical = post.data.canonicalUrl ?? new URL(`/blog/${post.id}.html`, Astro.site).toString();
 
@@ -63,8 +64,18 @@ const breadcrumbs = breadcrumbSchema([
   canonicalUrl={canonical}
   ogImage={ogImage}
   type="article"
+  searchType="Blog"
 >
-  <BlogPostLayout post={post} related={related} previous={previous} next={next}>
+  <BlogPostLayout
+    post={post}
+    headings={headings}
+    readingTime={readingTime(post)}
+    canonical={canonical}
+    editUrl={editUrl(post.filePath, siteConfig.repo)}
+    related={related}
+    previous={previous}
+    next={next}
+  >
     <Content />
   </BlogPostLayout>
   <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)}></script>

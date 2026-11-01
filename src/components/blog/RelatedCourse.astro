@@ -1,0 +1,25 @@
+---
+interface Props {
+  course: { title: string; url: string; description?: string; cta: string };
+  slug: string;
+}
+
+const { course, slug } = Astro.props;
+const external = /^https?:\/\//.test(course.url);
+---
+
+<aside class="my-10 rounded-card border border-primary-border bg-primary-soft p-5 sm:p-6" aria-label="Related course" data-pagefind-ignore>
+  <p class="eyebrow">Go deeper</p>
+  <p class="mt-1 text-lg font-bold text-ink">{course.title}</p>
+  {course.description && <p class="mt-2 text-sm text-ink-soft">{course.description}</p>}
+  <a
+    href={course.url}
+    class="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white no-underline transition hover:bg-primary-hover hover:text-white hover:no-underline"
+    data-track-event="Related course"
+    data-track-post={slug}
+    target={external ? "_blank" : undefined}
+    rel={external ? "noopener noreferrer" : undefined}
+  >
+    {course.cta}{external && <span class="sr-only"> (opens in a new tab)</span>}
+  </a>
+</aside>

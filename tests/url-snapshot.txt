@@ -21,6 +21,7 @@
 /search.html
 /services.html
 /sitemap-index.xml
+/tags.html
 /tags/aws-systems-manager.html
 /tags/aws.html
 /tags/cicd.html
@@ -38,8 +39,6 @@
 /videos/aws-migration-standardization.html
 /videos/devops-aws-video-4.html
 /videos/enterprise-patch-automation.html
-/videos/video-_ddwgjxssbq.html
-/videos/video-_tlwi6ipori.html
 /videos/video--i2k6kbwk3u.html
 /videos/video--lb682ny5ty.html
 /videos/video-0hpwqlw8vac.html
@@ -58,6 +57,8 @@
 /videos/video-8lvlqqalqmu.html
 /videos/video-8vu12lx2pvq.html
 /videos/video-9pqe0yr7j64.html
+/videos/video-_ddwgjxssbq.html
+/videos/video-_tlwi6ipori.html
 /videos/video-a-5l8qldwou.html
 /videos/video-ac9pmyb268s.html
 /videos/video-ahzzqlb_k40.html

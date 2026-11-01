@@ -38,7 +38,7 @@ const { links, currentPath } = Astro.props;
       ))}
     </ul>
     <div class="mt-3 border-t border-border pt-3">
-      <Button href={bookCallLink.href} class="w-full">{bookCallLink.label}</Button>
+      <Button href={bookCallLink.href} class="w-full" trackEvent="Book a call" trackLocation="mobile menu">{bookCallLink.label}</Button>
     </div>
   </nav>
 </details>

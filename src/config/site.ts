@@ -45,6 +45,22 @@ export const siteConfig = {
     github: { label: "GitHub", handle: "devops4solutions", url: "https://github.com/devops4solutions" },
   },
   defaultSocialImage: "/og/default.png",
+  /** Source repository, used for "Edit on GitHub" links. */
+  repo: {
+    url: "https://github.com/devops4solutions/website-devops",
+    branch: "main",
+  },
+  /** Blog index and tag pages show this many posts per page. */
+  postsPerPage: 9,
+  /** X (Twitter) handle for the twitter:site meta tag, e.g. "@devops4solutions". Leave empty if none. */
+  xHandle: "",
+  comments: {
+    /**
+     * "custom" loads /giscus-theme.css (site colours) in production builds; it needs a CORS header on
+     * that file, see docs/phase-1a-setup.md. "light" uses Giscus's built-in theme.
+     */
+    theme: "custom" as "custom" | "light",
+  },
 } as const;
 
 /** Primary header navigation (desktop and mobile). */

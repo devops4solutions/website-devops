@@ -57,7 +57,7 @@ const breadcrumbSchema = {
 };
 ---
 
-<BaseLayout title={`${video.data.title} | DevOps4Solutions`} description={video.data.description} canonicalUrl={pageUrl} type="video.other" ogImage={thumb} noindex={video.data.noindex}>
+<BaseLayout title={`${video.data.title} | DevOps4Solutions`} description={video.data.description} canonicalUrl={pageUrl} type="video.other" ogImage={thumb} noindex={video.data.noindex} searchType="Video">
   <ContentLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Videos", href: "/videos.html" }, { label: video.data.title }]}
     title={video.data.title}

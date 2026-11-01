@@ -11,6 +11,7 @@ import cicdImage from "../assets/images/services/CICD-Automation.png";
 import migrationImage from "../assets/images/services/Enterprise-Cloud-Migration.png";
 import observabilityImage from "../assets/images/services/Observability-Patch-Ops.png";
 import { getPublishedCaseStudies, getPublishedPosts, getPublishedVideos } from "../lib/content/queries";
+import { siteGraph } from "../lib/seo/schema";
 
 const allBlog = await getPublishedPosts();
 const allCaseStudies = await getPublishedCaseStudies();
@@ -53,6 +54,7 @@ const serviceTiles = [
 ---
 
 <BaseLayout>
+	<script type="application/ld+json" set:html={JSON.stringify(siteGraph())}></script>
 	<!-- Hero -->
 	<section class="relative overflow-hidden border-b border-slate-200 bg-white py-16 sm:py-20">
 		<div class="pointer-events-none absolute inset-0" aria-hidden="true">

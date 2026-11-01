@@ -47,6 +47,7 @@ const ogUrl = ogImage.startsWith("http") ? ogImage : new URL(ogImage, site).toSt
 )}
 
 <meta name="twitter:card" content="summary_large_image" />
+{siteConfig.xHandle && <meta name="twitter:site" content={siteConfig.xHandle} />}
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogUrl} />

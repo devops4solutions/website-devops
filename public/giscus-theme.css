@@ -1,0 +1,24 @@
+/* Giscus comments theme matched to devops4solutions.com (see src/styles/global.css tokens).
+   Loaded by Giscus inside its iframe; it builds on Giscus's light theme and overrides the brand colours. */
+@import url("https://giscus.app/themes/light.css");
+
+main {
+  --color-accent-fg: #2563eb;
+  --color-accent-emphasis: #2563eb;
+  --color-accent-muted: #bfdbfe;
+  --color-accent-subtle: #eff6ff;
+  --color-btn-primary-bg: #2563eb;
+  --color-btn-primary-border: #2563eb;
+  --color-btn-primary-hover-bg: #1d4ed8;
+  --color-btn-primary-hover-border: #1d4ed8;
+  --color-btn-primary-selected-bg: #1d4ed8;
+  --color-fg-default: #0f172a;
+  --color-fg-muted: #475569;
+  --color-fg-subtle: #64748b;
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f8fafc;
+  --color-border-default: #e2e8f0;
+  --color-border-muted: #e2e8f0;
+  --color-segmented-control-bg: #eff6ff;
+  font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}

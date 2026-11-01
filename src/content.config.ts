@@ -21,8 +21,18 @@ const blog = defineCollection({
     imageAlt: z.string().optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
-    readingTime: z.string().optional(),
+    readingTime: z.string().optional(), // optional override; otherwise computed from the post body
     canonicalUrl: z.url().optional(),
+    comments: z.boolean().default(true), // set false to hide Giscus comments on this post
+    // Optional call-to-action box at the end of the post, pointing to a course or learning resource.
+    relatedCourse: z
+      .object({
+        title: z.string(),
+        url: z.string(),
+        description: z.string().optional(),
+        cta: z.string().default("View course"),
+      })
+      .optional(),
   }),
 });
 

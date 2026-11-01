@@ -1,0 +1,78 @@
+---
+interface Props {
+  url: string;
+  title: string;
+  slug: string;
+  editUrl?: string;
+}
+
+const { url, title, slug, editUrl } = Astro.props;
+const encodedUrl = encodeURIComponent(url);
+const encodedTitle = encodeURIComponent(title);
+
+const linkClass =
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-medium text-ink-soft no-underline transition hover:border-primary-border hover:text-primary hover:no-underline";
+---
+
+<div class="share-links flex flex-col gap-4 border-y border-border py-5 sm:flex-row sm:items-center sm:justify-between" data-pagefind-ignore data-share-slug={slug} data-share-url={url} data-share-title={title}>
+  <div class="flex flex-wrap items-center gap-2">
+    <span class="mr-1 text-sm font-semibold text-ink">Share</span>
+    <!-- Native share sheet (WhatsApp, Messages, …) on devices that support it; revealed by script. -->
+    <button type="button" class={linkClass} data-share="native" hidden>Share…</button>
+    <a class={linkClass} data-share="linkedin" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} target="_blank" rel="noopener noreferrer">
+      LinkedIn<span class="sr-only"> (opens in a new tab)</span>
+    </a>
+    <a class={linkClass} data-share="x" href={`https://x.com/intent/post?url=${encodedUrl}&text=${encodedTitle}`} target="_blank" rel="noopener noreferrer">
+      X<span class="sr-only"> (opens in a new tab)</span>
+    </a>
+    <button type="button" class={linkClass} data-share="copy" hidden>
+      <span data-copy-label>Copy link</span>
+    </button>
+  </div>
+  {editUrl && (
+    <a href={editUrl} class="inline-flex min-h-11 items-center text-sm text-ink-soft hover:text-primary" target="_blank" rel="noopener noreferrer">
+      Edit on GitHub<span class="sr-only"> (opens in a new tab)</span>
+    </a>
+  )}
+</div>
+
+<script>
+  import { track } from "../../lib/analytics/track";
+
+  for (const root of document.querySelectorAll<HTMLElement>(".share-links")) {
+    const { shareSlug: slug = "", shareUrl: url = location.href, shareTitle: title = document.title } = root.dataset;
+    const native = root.querySelector<HTMLButtonElement>('[data-share="native"]');
+    const copy = root.querySelector<HTMLButtonElement>('[data-share="copy"]');
+
+    if (native && typeof navigator.share === "function") {
+      native.hidden = false;
+      native.addEventListener("click", async () => {
+        try {
+          await navigator.share({ title, url });
+          track("Share", { post: slug, method: "native" });
+        } catch {
+          // Dismissed by the user.
+        }
+      });
+    }
+
+    if (copy && navigator.clipboard) {
+      copy.hidden = false;
+      const label = copy.querySelector("[data-copy-label]");
+      copy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          if (label) label.textContent = "Link copied";
+          track("Share", { post: slug, method: "copy" });
+          setTimeout(() => label && (label.textContent = "Copy link"), 2000);
+        } catch {
+          if (label) label.textContent = "Copy failed";
+        }
+      });
+    }
+
+    for (const link of root.querySelectorAll<HTMLAnchorElement>('a[data-share]')) {
+      link.addEventListener("click", () => track("Share", { post: slug, method: link.dataset.share ?? "link" }));
+    }
+  }
+</script>

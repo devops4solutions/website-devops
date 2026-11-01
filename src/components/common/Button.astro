@@ -6,8 +6,11 @@ interface Props {
   type?: "button" | "submit";
   ariaLabel?: string;
   class?: string;
+  /** Analytics custom event sent on click (see BaseLayout), e.g. "Book a call". */
+  trackEvent?: string;
+  trackLocation?: string;
 }
-const { href, variant = "primary", size = "md", type = "button", ariaLabel, class: className = "" } = Astro.props;
+const { href, variant = "primary", size = "md", type = "button", ariaLabel, class: className = "", trackEvent, trackLocation } = Astro.props;
 
 const base =
   "inline-flex items-center justify-center rounded-full font-semibold no-underline transition hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
@@ -24,11 +27,11 @@ const classes = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
 
 {
   href ? (
-    <a href={href} class={classes} aria-label={ariaLabel}>
+    <a href={href} class={classes} aria-label={ariaLabel} data-track-event={trackEvent} data-track-location={trackLocation}>
       <slot />
     </a>
   ) : (
-    <button type={type} class={classes} aria-label={ariaLabel}>
+    <button type={type} class={classes} aria-label={ariaLabel} data-track-event={trackEvent} data-track-location={trackLocation}>
       <slot />
     </button>
   )

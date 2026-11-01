@@ -18,7 +18,7 @@ const serviceTypes = [
   "Observability & Patch Operations",
 ];
 
-/** Site-wide graph: the person, the consulting business and the website. */
+/** Homepage graph: the person, the consulting business and the website. */
 export const siteGraph = () => ({
   "@context": "https://schema.org",
   "@graph": [
@@ -86,10 +86,11 @@ export const articleSchema = ({ type, url, title, description, image, published,
   image: new URL(image, SITE).toString(),
   datePublished: published.toISOString(),
   dateModified: (modified ?? published).toISOString(),
-  author: { "@id": PERSON_ID },
-  publisher: { "@id": ORG_ID },
-  mainEntityOfPage: url,
-  isPartOf: { "@id": WEBSITE_ID },
+  // Named inline (not just @id) because the full Person/Organization entities live on the homepage.
+  author: { "@type": "Person", "@id": PERSON_ID, name: siteConfig.author.name, url: `${SITE}/about.html` },
+  publisher: { "@type": "Organization", "@id": ORG_ID, name: siteConfig.name, url: `${SITE}/` },
+  mainEntityOfPage: { "@type": "WebPage", "@id": url },
+  isPartOf: { "@type": "WebSite", "@id": WEBSITE_ID, name: siteConfig.name, url: `${SITE}/` },
   ...(keywords?.length ? { keywords: keywords.join(", ") } : {}),
   ...(section ? { articleSection: section } : {}),
 });

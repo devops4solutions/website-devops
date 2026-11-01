@@ -1,0 +1,71 @@
+---
+// "Was this helpful?" vote. Sent as an analytics custom event (no database); the visitor's vote is
+// remembered in localStorage so they see a thank-you instead of the buttons. Hidden without JavaScript.
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const buttonClass =
+  "inline-flex min-h-11 min-w-20 items-center justify-center gap-2 rounded-full border border-border bg-surface px-5 text-sm font-semibold text-ink transition hover:border-primary hover:text-primary";
+---
+
+<section class="helpful-vote my-10 rounded-card border border-border bg-surface-muted p-5 text-center sm:p-6" data-slug={slug} aria-labelledby={`helpful-${slug}`} data-pagefind-ignore hidden>
+  <div data-state="ask">
+    <h2 id={`helpful-${slug}`} class="text-base font-semibold text-ink">Was this article helpful?</h2>
+    <div class="mt-4 flex justify-center gap-3">
+      <button type="button" class={buttonClass} data-vote="yes"><span aria-hidden="true">👍</span> Yes</button>
+      <button type="button" class={buttonClass} data-vote="no"><span aria-hidden="true">👎</span> No</button>
+    </div>
+  </div>
+  <p data-state="thanks" class="text-sm font-medium text-ink" role="status" hidden>
+    Thanks for your feedback!
+    <span data-thanks-no hidden> If something was missing, <a href="/contact.html">tell me what you were looking for</a>.</span>
+  </p>
+</section>
+
+<script>
+  import { track } from "../../lib/analytics/track";
+
+  const storageKey = (slug: string) => `d4s:helpful:${slug}`;
+  const read = (slug: string) => {
+    try {
+      return localStorage.getItem(storageKey(slug));
+    } catch {
+      return null; // Storage blocked (private mode, site data disabled).
+    }
+  };
+  const write = (slug: string, vote: string) => {
+    try {
+      localStorage.setItem(storageKey(slug), vote);
+    } catch {
+      // Ignore: the vote is still sent, it just isn't remembered.
+    }
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>(".helpful-vote")) {
+    const slug = root.dataset.slug ?? "";
+    const ask = root.querySelector<HTMLElement>('[data-state="ask"]');
+    const thanks = root.querySelector<HTMLElement>('[data-state="thanks"]');
+    const showThanks = (vote: string) => {
+      if (ask) ask.hidden = true;
+      if (thanks) thanks.hidden = false;
+      const noHint = root.querySelector<HTMLElement>("[data-thanks-no]");
+      if (noHint) noHint.hidden = vote !== "no";
+    };
+
+    root.hidden = false;
+    const previous = read(slug);
+    if (previous) showThanks(previous);
+
+    for (const button of root.querySelectorAll<HTMLButtonElement>("[data-vote]")) {
+      button.addEventListener("click", () => {
+        const vote = button.dataset.vote ?? "";
+        if (read(slug)) return;
+        write(slug, vote);
+        track("Helpful", { post: slug, vote });
+        showThanks(vote);
+      });
+    }
+  }
+</script>

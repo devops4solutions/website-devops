@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import PostListing from "../../../../components/blog/PostListing.astro";
+import { getPublishedPosts } from "../../../../lib/content/queries";
+import { pageUrl, paginate, tagCounts } from "../../../../lib/content/blog";
+import { slugify } from "../../../../utils/content";
+import { siteConfig } from "../../../../config/site";
+
+// Tag pages 2..n at /tags/<tag>/page/<n>.html (page 1 is /tags/<tag>.html).
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return tagCounts(posts).flatMap(({ tag, slug }) => {
+    const matches = posts.filter((post) => post.data.tags.some((entry) => slugify(entry) === slug));
+    const pages = paginate(matches, siteConfig.postsPerPage);
+    return pages.slice(1).map((pagePosts, index) => ({
+      params: { tag: slug, page: String(index + 2) },
+      props: { tag, pagePosts, allPosts: posts, lastPage: pages.length },
+    }));
+  });
+}
+
+interface Props {
+  tag: string;
+  pagePosts: CollectionEntry<"blog">[];
+  allPosts: CollectionEntry<"blog">[];
+  lastPage: number;
+}
+
+const { tag, pagePosts, allPosts, lastPage } = Astro.props;
+const currentPage = Number(Astro.params.page);
+const base = `/tags/${Astro.params.tag}`;
+---
+
+<BaseLayout title={`${tag} Articles – Page ${currentPage} | DevOps4Solutions`} description={`Articles about ${tag} (page ${currentPage}).`}>
+  <PostListing
+    heading={`#${tag}`}
+    breadcrumbs={[{ label: "Home", href: "/" }, { label: "Tags", href: "/tags.html" }, { label: tag, href: `${base}.html` }, { label: `Page ${currentPage}` }]}
+    posts={pagePosts}
+    allPosts={allPosts}
+    currentPage={currentPage}
+    lastPage={lastPage}
+    urlFor={(page) => pageUrl(base, page)}
+  />
+</BaseLayout>
