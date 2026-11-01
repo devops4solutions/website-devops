@@ -44,17 +44,44 @@ Do **not** rewrite `.html` paths in this function. The site's canonical URLs are
 
 ## 3. Security headers
 
-CloudFront → **Policies → Response headers** → create a policy and attach it to the default behavior:
+The headers are kept in the repo as CloudFront response-headers policies:
 
-| Header | Value |
-|---|---|
-| Strict-Transport-Security | `max-age=31536000; includeSubDomains` (enable *preload* only once you are sure every subdomain serves HTTPS) |
-| X-Content-Type-Options | `nosniff` |
-| Referrer-Policy | `strict-origin-when-cross-origin` |
-| X-Frame-Options | `SAMEORIGIN` |
-| Permissions-Policy (custom header) | `camera=(), microphone=(), geolocation=()` |
+| File | What it sets | Attach to |
+|---|---|---|
+| `infra/cloudfront/security-headers-policy.json` | HSTS, `nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy`, `Permissions-Policy`, and a CSP header with `frame-ancestors 'self'; object-src 'none'; base-uri 'self'` | Default behavior (`*`) |
+| `infra/cloudfront/giscus-theme-cors-policy.json` | CORS for the Giscus comments theme | A behavior for `/giscus-theme.css` |
 
-A Content-Security-Policy is deliberately left for Phase 1. The site will then load Cal.com, Turnstile, Giscus and analytics, and the policy should be written once against that final list (ship it as `Content-Security-Policy-Report-Only` first).
+```sh
+aws cloudfront create-response-headers-policy \
+  --response-headers-policy-config file://infra/cloudfront/security-headers-policy.json
+aws cloudfront create-response-headers-policy \
+  --response-headers-policy-config file://infra/cloudfront/giscus-theme-cors-policy.json
+```
+
+Then, in the CloudFront console:
+1. **Behaviors** → edit **Default (\*)** → *Response headers policy* → `devops4solutions-security-headers`.
+2. **Create behavior** for the path pattern `/giscus-theme.css`, using the same S3 origin, with *Response headers policy* set to `devops4solutions-giscus-theme-cors`.
+
+To change a policy later, use `aws cloudfront update-response-headers-policy` with the policy's `--id` and `--if-match` ETag.
+
+**Where the full Content-Security-Policy lives:**
+- **In each page:** Astro writes it as a `<meta http-equiv="content-security-policy">` tag, with a hash for every inline script (`security.csp` in `astro.config.mjs`). It's regenerated on every build, so it never goes out of date when scripts change.
+- **In the CloudFront header:** only the directives a `<meta>` tag cannot set (`frame-ancestors`). Browsers enforce both policies together.
+- **New third-party services** (for example a different analytics provider or a Stripe Buy Button) must be added to the `csp` lists in `astro.config.mjs`.
+
+**Moving to Netlify or Cloudflare Pages?** Put the same headers in a `public/_headers` file:
+
+```
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=()
+  Content-Security-Policy: frame-ancestors 'self'; object-src 'none'; base-uri 'self'
+/giscus-theme.css
+  Access-Control-Allow-Origin: https://giscus.app
+```
 
 ## 4. Deploy the new build
 
