@@ -7,7 +7,7 @@ export const features = {
   /** /learn.html hub: courses, guides, labs and paths (roadmap Phase 2). */
   learn: false,
   /** /consulting.html with session types and Cal.com booking (roadmap 1.3). */
-  consulting: false,
+  consulting: true,
   /** /project-request.html form posting to /api/project-request (roadmap 1.5). */
   projectRequest: false,
   /** /pay.html with invoice and Payment Link instructions (roadmap 1.7). */
