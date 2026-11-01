@@ -1,0 +1,56 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/common/Container.astro";
+import PaymentLinks from "../components/payments/PaymentLinks.astro";
+import { features, siteConfig } from "../config/site";
+
+const { stripe, razorpay } = siteConfig.payments;
+---
+
+<BaseLayout
+  title="Payments | DevOps4Solutions"
+  description="How to pay DevOps4Solutions invoices and fixed-price sessions securely through Stripe."
+  noindex={!features.pay}
+>
+  <Container className="py-12 sm:py-16">
+    <div class="max-w-3xl">
+      <p class="eyebrow mb-3">Payments</p>
+      <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Paying an invoice</h1>
+      <p class="mt-4 text-lg text-ink-soft">
+        Project deposits and milestones are invoiced by email. Every invoice includes a secure link to pay online.
+      </p>
+
+      <ol class="mt-8 space-y-4">
+        <li class="rounded-card border border-border bg-surface p-5">
+          <p class="font-semibold text-ink">1. Look for the invoice email from Stripe</p>
+          <p class="mt-1 text-sm text-ink-soft">It comes from Stripe on behalf of {siteConfig.name} and shows the invoice number, amount and due date.</p>
+        </li>
+        <li class="rounded-card border border-border bg-surface p-5">
+          <p class="font-semibold text-ink">2. Select "Pay this invoice"</p>
+          <p class="mt-1 text-sm text-ink-soft">You'll go to Stripe's secure payment page. Pay by card, or by other methods enabled for your country.</p>
+        </li>
+        <li class="rounded-card border border-border bg-surface p-5">
+          <p class="font-semibold text-ink">3. Get your receipt</p>
+          <p class="mt-1 text-sm text-ink-soft">Stripe emails a receipt and a PDF invoice for your records as soon as the payment goes through.</p>
+        </li>
+      </ol>
+
+      <div class="mt-6 rounded-card border border-primary-border bg-primary-soft p-5 text-sm text-ink">
+        <p class="font-semibold">Your payment details stay with the payment provider</p>
+        <p class="mt-1 text-ink-soft">
+          This website never asks for card or bank details. If an email asks you to pay anywhere other than a stripe.com
+          {features.razorpay && " or razorpay.com"} page, don't pay; contact me at
+          <a href={`mailto:${siteConfig.email}`} class="inline-block break-all py-1">{siteConfig.email}</a>.
+        </p>
+      </div>
+    </div>
+
+    <PaymentLinks provider="Stripe" links={stripe} note="Pay for these directly; you'll get a receipt by email." />
+    {features.razorpay && <PaymentLinks provider="Razorpay" links={razorpay} note="For payments in INR using UPI, Indian cards or net banking." />}
+
+    <p class="mt-10 max-w-3xl text-sm text-muted">
+      Can't find an invoice or need a change (company name, tax ID, purchase order)? Email
+      <a href={`mailto:${siteConfig.email}`} class="inline-block break-all py-1">{siteConfig.email}</a>.
+    </p>
+  </Container>
+</BaseLayout>
