@@ -15,7 +15,10 @@
 /categories/terraform.html
 /consulting.html
 /contact.html
+/hire-me.html
+/hire-me/thanks.html
 /index.html
+/pay.html
 /privacy.html
 /robots.txt
 /rss.xml
