@@ -1,148 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: light;
-  --bg: #ffffff;
-  --bg-soft: #eef4ff;
-  --surface: rgba(255, 255, 255, 0.92);
-  --surface-strong: #ffffff;
-  --text: #0f172a;
-  --text-soft: #475569;
-  --border: rgba(148, 163, 184, 0.22);
-  --accent: #2563eb;
-  --accent-soft: #0ea5e9;
+/*
+ * Design tokens.
+ * Each token is a CSS variable (e.g. var(--color-primary)) and a Tailwind utility
+ * (e.g. text-primary, bg-primary-soft, py-section, max-w-site, rounded-card, shadow-card).
+ */
+@theme {
+  /* Typography: Inter is self-hosted via @fontsource-variable/inter (see BaseLayout). */
+  --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Brand */
+  --color-brand-navy: #05306e; /* wordmark */
+  --color-primary: #2563eb; /* links, buttons, eyebrows */
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #eff6ff; /* tinted panels, header background */
+  --color-primary-border: #bfdbfe;
+  --color-accent: #0ea5e9;
+
+  /* Text */
+  --color-ink: #0f172a; /* headings, body text */
+  --color-ink-soft: #475569; /* secondary text */
+  --color-muted: #64748b; /* meta text, captions */
+
+  /* Surfaces and lines */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-page: #e8edf5;
+  --color-border: #e2e8f0;
+  --color-focus: #38bdf8;
+
+  /* Spacing (Tailwind's 0.25rem scale still applies; these are the layout-level steps) */
+  --spacing-gutter: 1rem; /* horizontal page padding on phones */
+  --spacing-section: 3.5rem; /* vertical padding of a page section */
+  --spacing-section-lg: 5rem; /* hero sections */
+  --container-site: 80rem; /* max content width */
+
+  /* Shape */
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 4px rgb(15 23 42 / 0.07);
+  --shadow-card-hover: 0 4px 16px rgb(37 99 235 / 0.09);
 }
 
-html,
-body {
-  min-height: 100%;
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  /* Long words (product names, URLs) wrap instead of widening the page on small screens. */
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  li,
+  dd {
+    overflow-wrap: break-word;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+  }
+
+  a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 }
 
-body {
-  margin: 0;
-  background: #e8edf5;
-  color: #0f172a;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-}
+@layer components {
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+  }
 
-img {
-  max-width: 100%;
-  display: block;
-}
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    border-radius: 0.5rem;
+    background: #dbeafe;
+    color: var(--color-ink);
+    padding: 0.5rem 1rem;
+  }
 
-:where(a) {
-  color: #2563eb;
-  text-underline-offset: 3px;
-  transition: color 0.15s;
-  text-decoration: none;
-}
+  .prose-content {
+    max-width: none;
+    color: var(--color-ink);
+  }
 
-:where(a:hover) {
-  color: #1e40af;
-  text-decoration: underline;
-}
+  .prose-content h2,
+  .prose-content h3,
+  .prose-content h4 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
 
-a.bg-blue-600,
-a.bg-blue-700,
-a.bg-blue-800,
-a.bg-blue-600:hover,
-a.bg-blue-700:hover,
-a.bg-blue-800:hover {
-  color: #ffffff;
-  text-decoration: none;
-}
+  .prose-content p,
+  .prose-content li {
+    line-height: 1.75;
+    color: var(--color-ink-soft);
+  }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-summary:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
-}
+  .prose-content ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
 
-.skip-link {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-}
+  .prose-content code {
+    border-radius: 0.25rem;
+    background: var(--color-border);
+    color: var(--color-ink);
+    padding: 0.125rem 0.375rem;
+  }
 
-.skip-link:focus {
-  left: 1rem;
-  top: 1rem;
-  z-index: 100;
-  border-radius: 0.5rem;
-  background: #dbeafe;
-  color: #0f172a;
-  padding: 0.5rem 1rem;
-}
+  .prose-content pre code {
+    background: none;
+    padding: 0;
+  }
 
-.prose-content {
-  max-width: none;
-  color: var(--text);
-}
+  .card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
 
-.prose-content h2,
-.prose-content h3,
-.prose-content h4 {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  color: var(--text);
-}
+  .card:hover {
+    border-color: var(--color-primary-border);
+    box-shadow: var(--shadow-card-hover);
+  }
 
-.prose-content p,
-.prose-content li {
-  line-height: 1.75;
-  color: var(--text-soft);
-}
+  .section-shell {
+    border-top: 1px solid var(--color-border);
+  }
 
-.prose-content ul {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-}
-
-.prose-content code {
-  border-radius: 0.25rem;
-  background: #e2e8f0;
-  color: #0f172a;
-  padding: 0.125rem 0.375rem;
-}
-
-.prose-content pre code {
-  background: none;
-  padding: 0;
-}
-
-.card {
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.07);
-}
-
-.card:hover {
-  border-color: #bfdbfe;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.09);
-}
-
-.section-shell {
-  border-top: 1px solid #e2e8f0;
-}
-
-.soft-panel {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-}
-
-.eyebrow {
-  color: #2563eb;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  .eyebrow {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

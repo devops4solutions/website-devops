@@ -7,11 +7,11 @@ const { before, after } = Astro.props;
 ---
 
 <section class="my-8 grid gap-4 md:grid-cols-2">
-  <div class="card p-4">
+  <div class="card min-w-0 p-4">
     <h3 class="mb-2 font-semibold text-slate-950">Before</h3>
     <pre class="overflow-x-auto rounded-lg bg-slate-50 p-3 text-sm text-slate-800"><code>{before}</code></pre>
   </div>
-  <div class="card p-4">
+  <div class="card min-w-0 p-4">
     <h3 class="mb-2 font-semibold text-slate-950">After</h3>
     <pre class="overflow-x-auto rounded-lg bg-slate-50 p-3 text-sm text-slate-800"><code>{after}</code></pre>
   </div>

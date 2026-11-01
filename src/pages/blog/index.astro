@@ -34,7 +34,7 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
           <h2 class="text-lg font-semibold text-slate-950">Categories</h2>
           <ul class="mt-3 space-y-2 text-sm">
             {categories.map((category) => (
-              <li><a href={`/categories/${slugify(category)}.html`}>{category}</a></li>
+              <li><a class="inline-block py-1" href={`/categories/${slugify(category)}.html`}>{category}</a></li>
             ))}
           </ul>
         </section>

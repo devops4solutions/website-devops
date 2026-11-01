@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Container from "../components/common/Container.astro";
+import { siteConfig } from "../config/site";
+
+const mailto = `mailto:${siteConfig.email}`;
+const socials = Object.values(siteConfig.social);
 ---
 
 <BaseLayout title="Contact | DevOps4Solutions" description="Contact DevOps4Solutions.">
@@ -16,26 +20,26 @@ import Container from "../components/common/Container.astro";
     <div class="grid gap-10 lg:grid-cols-[1fr_320px]">
       <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 class="text-xl font-semibold text-slate-950">Start a conversation</h2>
-        <p class="mt-3 text-slate-600">For architecture reviews, cloud migration, Terraform, Kubernetes, or CI/CD work, email <a href="mailto:devops4solutions@gmail.com" class="text-blue-600 hover:underline">devops4solutions@gmail.com</a>.</p>
+        <p class="mt-3 text-slate-600">For architecture reviews, cloud migration, Terraform, Kubernetes, or CI/CD work, email <a href={mailto}>{siteConfig.email}</a>.</p>
       </section>
 
       <!-- Contact details sidebar -->
       <aside class="space-y-5">
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">Contact details</h2>
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-muted">Contact details</h2>
           <ul class="space-y-3 text-sm text-slate-700">
-            <li><span class="font-medium">Email</span><br/><a href="mailto:devops4solutions@gmail.com" class="text-blue-600 hover:underline">devops4solutions@gmail.com</a></li>
-            <li><span class="font-medium">YouTube</span><br/><a href="https://www.youtube.com/@DevOps4solutions/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">@DevOps4solutions</a></li>
-            <li><span class="font-medium">LinkedIn</span><br/><a href="https://www.linkedin.com/in/nidhi-gupta-6a289575/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">Nidhi Gupta</a></li>
-            <li><span class="font-medium">Instagram</span><br/><a href="https://www.instagram.com/devops4solutions/" class="text-blue-600 hover:underline" target="_blank" rel="noreferrer">@devops4solutions</a></li>
+            <li><span class="font-medium">Email</span><br/><a href={mailto} class="inline-block py-1 break-all">{siteConfig.email}</a></li>
+            {socials.map((profile) => (
+              <li><span class="font-medium">{profile.label}</span><br/><a href={profile.url} class="inline-block py-1" target="_blank" rel="noreferrer">{profile.handle}</a></li>
+            ))}
           </ul>
         </div>
         <div class="rounded-xl border border-blue-100 bg-blue-50 p-5">
           <p class="text-sm font-semibold text-slate-950">Prefer to browse first?</p>
           <ul class="mt-3 space-y-2 text-sm">
-            <li><a href="/services.html" class="text-blue-600 hover:underline">View all services →</a></li>
-            <li><a href="/case-studies.html" class="text-blue-600 hover:underline">Read case studies →</a></li>
-            <li><a href="/blog.html" class="text-blue-600 hover:underline">Read the blog →</a></li>
+            <li><a href="/services.html" class="inline-block py-1 text-blue-600 hover:underline">View all services →</a></li>
+            <li><a href="/case-studies.html" class="inline-block py-1 text-blue-600 hover:underline">Read case studies →</a></li>
+            <li><a href="/blog.html" class="inline-block py-1 text-blue-600 hover:underline">Read the blog →</a></li>
           </ul>
         </div>
       </aside>

@@ -1,4 +1,4 @@
-import { siteConfig } from "../../data/site";
+import { siteConfig } from "../../config/site";
 
 // schema.org JSON-LD builders. Entities share stable @id values so search engines can link them.
 
@@ -7,7 +7,7 @@ export const PERSON_ID = `${SITE}/#person`;
 export const ORG_ID = `${SITE}/#organization`;
 export const WEBSITE_ID = `${SITE}/#website`;
 
-const sameAs = [siteConfig.youtubeUrl, siteConfig.linkedinUrl, siteConfig.instagramUrl, siteConfig.githubUrl];
+const sameAs = Object.values(siteConfig.social).map((profile) => profile.url);
 
 const serviceTypes = [
   "AWS Cloud Architecture",
@@ -25,8 +25,8 @@ export const siteGraph = () => ({
     {
       "@type": "Person",
       "@id": PERSON_ID,
-      name: siteConfig.author,
-      jobTitle: "Lead Platform DevOps Engineer",
+      name: siteConfig.author.name,
+      jobTitle: siteConfig.author.jobTitle,
       url: `${SITE}/about.html`,
       sameAs,
       knowsAbout: ["AWS", "Terraform", "Kubernetes", "Amazon EKS", "CI/CD", "Platform Engineering", "Cloud Migration"],

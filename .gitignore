@@ -3,7 +3,9 @@ dist/
 .astro/
 
 .env
-.env.local
+.env.*
+!.env.example
+.dev.vars
 
 .DS_Store
 

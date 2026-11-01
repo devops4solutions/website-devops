@@ -85,11 +85,11 @@ const serviceTiles = [
 		<Container>
 			<div class="mb-8 flex items-end justify-between">
 				<h2 class="text-2xl font-bold text-slate-950">Services</h2>
-				<a href="/services.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+				<a href="/services.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">See all →</a>
 			</div>
 			<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 				{serviceTiles.map((service) => (
-					<a href="/services.html" class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+					<a href="/services.html" class="no-underline hover:no-underline group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
 						<Image
 							src={service.image}
 							alt=""
@@ -117,12 +117,12 @@ const serviceTiles = [
 					<div>
 						<div class="mb-4 flex items-end justify-between">
 							<h2 class="text-xl font-bold text-slate-950">Latest Posts</h2>
-							<a href="/blog.html" class="text-sm text-blue-600 hover:underline">All posts →</a>
+							<a href="/blog.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">All posts →</a>
 						</div>
 						<ul class="space-y-3">
 							{allBlog.slice(0, 3).map((post) => (
 								<li>
-									<a href={`/blog/${post.id}.html`} class="block rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+									<a href={`/blog/${post.id}.html`} class="no-underline hover:no-underline block rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 										<p class="eyebrow">{post.data.category}</p>
 										<h3 class="mt-1 text-sm font-semibold text-slate-950">{post.data.title}</h3>
 									</a>
@@ -135,11 +135,11 @@ const serviceTiles = [
 					<div>
 						<div class="mb-6 flex items-end justify-between">
 							<h2 class="text-2xl font-bold text-slate-950">Case Studies</h2>
-							<a href="/case-studies.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+							<a href="/case-studies.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">See all →</a>
 						</div>
 						<div class="space-y-4">
 							{featuredCaseStudies.slice(0, 3).map((item) => (
-								<a href={`/case-studies/${item.id}.html`} class="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+								<a href={`/case-studies/${item.id}.html`} class="no-underline hover:no-underline flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 									<div class="flex-1 min-w-0">
 										<p class="eyebrow">{item.data.industry ?? "General"}</p>
 										<h3 class="mt-1 text-sm font-semibold text-slate-950">{item.data.title}</h3>
@@ -157,12 +157,12 @@ const serviceTiles = [
 					<div>
 						<div class="mb-4 flex items-end justify-between">
 							<h2 class="text-xl font-bold text-slate-950">Videos</h2>
-							<a href="/videos.html" class="text-sm text-blue-600 hover:underline">All videos →</a>
+							<a href="/videos.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">All videos →</a>
 						</div>
 						<ul class="space-y-3">
 							{allVideos.slice(0, 2).map((video) => (
 								<li>
-									<a href={`/videos/${video.id}.html`} class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+									<a href={`/videos/${video.id}.html`} class="no-underline hover:no-underline flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 										<img src={`https://img.youtube.com/vi/${video.data.youtubeId}/default.jpg`} alt="" width="60" height="45" class="rounded-lg object-cover" loading="lazy" />
 										<div class="min-w-0">
 											<p class="eyebrow">{video.data.category}</p>
@@ -186,7 +186,7 @@ const serviceTiles = [
 					<h2 class="text-xl font-bold text-slate-950">Need help designing or modernizing your AWS platform?</h2>
 					<p class="mt-1 text-sm text-slate-600">Architecture assessment, migration planning, or platform engineering support.</p>
 				</div>
-				<a href="/contact.html" class="shrink-0 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600 hover:text-white" style="text-decoration:none">Get in touch</a>
+				<Button href="/contact.html" class="shrink-0">Get in touch</Button>
 			</div>
 		</Container>
 	</section>
