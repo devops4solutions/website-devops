@@ -1,4 +1,5 @@
 ---
+slug: "enterprise-patch-automation"
 title: Enterprise Patch Automation Essentials
 description: Building reliable patch operations with AWS Systems Manager and shared ownership.
 pubDate: 2026-02-10

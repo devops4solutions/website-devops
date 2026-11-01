@@ -1,4 +1,5 @@
 ---
+slug: "enterprise-patch-automation"
 title: Enterprise Patch Automation with AWS Systems Manager
 description: Designed and implemented a centralized operating system patching framework for AWS using Systems Manager, custom patch baselines, and automated reporting.
 pubDate: 2026-02-25
@@ -17,7 +18,7 @@ technologies:
 challenge: Operating system patching was managed differently across AWS accounts, making governance, reporting, and operational consistency difficult to maintain.
 solution: Built a centralized AWS Systems Manager patching framework with custom patch baselines, standardized maintenance windows, and automated notifications.
 outcome: Reduced manual effort, improved compliance visibility, and established a consistent monthly patching process across enterprise AWS environments.
-image: /images/case-studies/patch2.png
+image: ../../assets/images/case-studies/patch-automation.png
 imageAlt: AWS Systems Manager Patch Automation
 featured: true
 draft: false

@@ -27,7 +27,11 @@ Modern static Astro website for DevOps4Solutions with technical blogs, enterpris
 
 - npm run check
 - npm run build
+- npm run check:urls (after build: no published URL removed, sitemap matches canonicals, no broken internal links)
 - npm run preview
+
+CI (.github/workflows/ci.yml) runs check, build and check:urls on every push and pull request.
+When you add pages on purpose, run `npm run check:urls -- --update` to record them in tests/url-snapshot.txt.
 
 ## Content workflows
 
@@ -35,8 +39,10 @@ Modern static Astro website for DevOps4Solutions with technical blogs, enterpris
 - Add case studies in src/data/case-studies/ using templates/case-study-template.md
 - Add videos in src/data/videos/ using templates/video-template.md
 - Use Markdown for normal content and MDX for component-rich content
-- Replace placeholder youtubeId values in content
-- Add local images under public/images/
+- Every entry needs a `slug` in frontmatter. It becomes the URL (/blog/<slug>.html) and must never change after publishing
+- Replace placeholder youtubeId values in content. Video entries with `noindex: true` have placeholder metadata: add the real title and description, then remove the flag
+- Case-study images go in src/assets/images/ (optimised by Astro); other static files go under public/images/
+- Social preview images are generated automatically at /og/... during the build
 
 ## Search with Pagefind
 

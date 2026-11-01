@@ -1,4 +1,5 @@
 ---
+slug: "why-terraform-modules-matter"
 title: Why Terraform Modules Matter at Enterprise Scale
 description: Explaining how reusable modules improve consistency and governance.
 pubDate: 2026-05-05

@@ -1,4 +1,5 @@
 ---
+slug: "kubernetes-storage-volumes-pvs-pvc-aws-storage"
 title: "Understanding Kubernetes Storage: Volumes, PVs, PVCs, and AWS Storage Options"
 description: A practical guide to Kubernetes storage concepts including Volumes, Persistent Volumes, Persistent Volume Claims, Storage Classes, and AWS storage options like EBS and EFS.
 pubDate: 2026-07-12

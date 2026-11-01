@@ -1,4 +1,5 @@
 ---
+slug: "reusable-infrastructure-with-terraform-modules"
 title: Reusable Infrastructure with Terraform Modules
 description: Learn how to build reusable Terraform modules to eliminate duplicate code and provision AWS infrastructure consistently across environments.
 pubDate: 2020-11-17
@@ -10,8 +11,6 @@ tags:
   - Infrastructure as Code
   - DevOps
   - Modules
-image: /images/blog/terraform-modules.webp
-imageAlt: Terraform modules used to provision reusable AWS infrastructure
 featured: false
 draft: false
 readingTime: 7 min

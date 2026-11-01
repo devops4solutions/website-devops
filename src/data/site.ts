@@ -9,7 +9,8 @@ export const siteConfig = {
   youtubeUrl: "https://www.youtube.com/@DevOps4solutions/",
   linkedinUrl: "https://www.linkedin.com/in/nidhi-gupta-6a289575/",
   instagramUrl: "https://www.instagram.com/devops4solutions/",
-  defaultSocialImage: "/images/social/og-default.svg",
+  githubUrl: "https://github.com/devops4solutions",
+  defaultSocialImage: "/og/default.png",
   navigation: [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services.html" },
