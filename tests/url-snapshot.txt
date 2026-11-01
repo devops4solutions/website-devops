@@ -13,6 +13,7 @@
 /categories/architecture.html
 /categories/operations.html
 /categories/terraform.html
+/consulting.html
 /contact.html
 /index.html
 /privacy.html

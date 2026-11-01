@@ -1,48 +1,141 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Container from "../components/common/Container.astro";
-import { siteConfig } from "../config/site";
+import { features, siteConfig } from "../config/site";
 
-const mailto = `mailto:${siteConfig.email}`;
 const socials = Object.values(siteConfig.social);
+const sessions = (await getCollection("sessions")).sort((a, b) => a.data.order - b.data.order);
+
+// mailto: links with a subject (and optional body template) so enquiries arrive pre-structured.
+const mailto = (subject?: string, body?: string) => {
+  const params = new URLSearchParams();
+  if (subject) params.set("subject", subject);
+  if (body) params.set("body", body);
+  const query = params.toString().replace(/\+/g, "%20");
+  return `mailto:${siteConfig.email}${query ? `?${query}` : ""}`;
+};
+
+const projectTemplate = [
+  "Hi Nidhi,",
+  "",
+  "Project type (e.g. AWS migration, landing zone, Terraform, EKS, CI/CD):",
+  "Budget range:",
+  "Timeline:",
+  "Short description of the goal and current setup:",
+  "",
+].join("\n");
+
+const routes = [
+  {
+    id: "consulting",
+    eyebrow: "Consulting & mentoring",
+    title: "Book a consultation",
+    text: "Intro calls, architecture deep dives, 1:1 mentoring and monthly advisory.",
+    href: features.consulting ? "/consulting.html" : mailto("Consultation request"),
+    cta: features.consulting ? "See sessions & book" : "Email to book",
+    trackEvent: "Contact consultation",
+  },
+  {
+    id: "project",
+    eyebrow: "Projects",
+    title: "Start a project",
+    text: "Fixed-scope work: AWS migrations, landing zones, Terraform modules, EKS platforms and CI/CD pipelines.",
+    href: features.projectRequest ? "/project-request.html" : mailto("Project enquiry", projectTemplate),
+    cta: features.projectRequest ? "Send a project request" : "Email project details",
+    trackEvent: "Contact project",
+  },
+  {
+    id: "general",
+    eyebrow: "Everything else",
+    title: "General questions",
+    text: "Questions about an article, a video, speaking or collaboration.",
+    href: mailto("Question from devops4solutions.com"),
+    cta: "Send an email",
+    trackEvent: "Contact general",
+  },
+];
 ---
 
-<BaseLayout title="Contact | DevOps4Solutions" description="Contact DevOps4Solutions.">
-  <section class="border-b border-slate-200 bg-white py-12">
+<BaseLayout title="Contact | DevOps4Solutions" description="Book a consultation, start an AWS or DevOps project, or ask a question. Contact Nidhi Gupta at DevOps4Solutions.">
+  <section class="border-b border-border bg-surface py-12">
     <Container>
       <p class="eyebrow mb-2">Get in touch</p>
-      <h1 class="text-3xl font-bold text-slate-950 sm:text-4xl">Contact Us</h1>
-      <p class="mt-3 text-slate-500">Reach out for architecture reviews, migration planning, or platform engineering support.</p>
+      <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Contact</h1>
+      <p class="mt-3 max-w-2xl text-ink-soft">Choose the option that fits best.</p>
+
+      <!-- Shown when arriving from a consulting "Book" button before online booking is set up. -->
+      <div data-session-notice class="mt-6 rounded-card border border-primary-border bg-primary-soft p-4 text-sm text-ink" role="status" hidden>
+        You're asking about <strong data-session-title></strong>. Email me with a few preferred times and I'll confirm a slot.
+        <a data-session-mailto href={mailto("Booking request")} class="mt-3 inline-flex min-h-11 items-center rounded-full bg-primary px-5 font-semibold text-white no-underline hover:bg-primary-hover hover:text-white hover:no-underline">
+          Email to book this session
+        </a>
+      </div>
     </Container>
   </section>
 
   <Container className="py-12">
-    <div class="grid gap-10 lg:grid-cols-[1fr_320px]">
-      <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="text-xl font-semibold text-slate-950">Start a conversation</h2>
-        <p class="mt-3 text-slate-600">For architecture reviews, cloud migration, Terraform, Kubernetes, or CI/CD work, email <a href={mailto}>{siteConfig.email}</a>.</p>
-      </section>
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="grid gap-5 md:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+        {routes.map((route) => (
+          <section id={route.id} class="flex scroll-mt-24 flex-col rounded-card border border-border bg-surface p-6 shadow-card" aria-labelledby={`${route.id}-heading`}>
+            <p class="eyebrow">{route.eyebrow}</p>
+            <h2 id={`${route.id}-heading`} class="mt-2 text-lg font-semibold text-ink">{route.title}</h2>
+            <p class="mb-5 mt-2 text-sm text-ink-soft">{route.text}</p>
+            <a
+              href={route.href}
+              data-track-event={route.trackEvent}
+              class="mt-auto inline-flex min-h-11 items-center justify-center rounded-full border border-primary-border bg-surface px-5 text-sm font-semibold text-primary no-underline hover:border-primary hover:bg-primary-soft hover:no-underline"
+            >
+              {route.cta}
+            </a>
+          </section>
+        ))}
+      </div>
 
-      <!-- Contact details sidebar -->
       <aside class="space-y-5">
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="rounded-card border border-border bg-surface p-5 shadow-card">
           <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-muted">Contact details</h2>
-          <ul class="space-y-3 text-sm text-slate-700">
-            <li><span class="font-medium">Email</span><br/><a href={mailto} class="inline-block py-1 break-all">{siteConfig.email}</a></li>
+          <ul class="space-y-3 text-sm text-ink">
+            <li><span class="font-medium">Email</span><br /><a href={mailto()} class="inline-block py-1 break-all">{siteConfig.email}</a></li>
             {socials.map((profile) => (
-              <li><span class="font-medium">{profile.label}</span><br/><a href={profile.url} class="inline-block py-1" target="_blank" rel="noreferrer">{profile.handle}</a></li>
+              <li>
+                <span class="font-medium">{profile.label}</span><br />
+                <a href={profile.url} class="inline-block py-1" target="_blank" rel="noreferrer">{profile.handle}</a>
+              </li>
             ))}
           </ul>
         </div>
-        <div class="rounded-xl border border-blue-100 bg-blue-50 p-5">
-          <p class="text-sm font-semibold text-slate-950">Prefer to browse first?</p>
-          <ul class="mt-3 space-y-2 text-sm">
-            <li><a href="/services.html" class="inline-block py-1 text-blue-600 hover:underline">View all services →</a></li>
-            <li><a href="/case-studies.html" class="inline-block py-1 text-blue-600 hover:underline">Read case studies →</a></li>
-            <li><a href="/blog.html" class="inline-block py-1 text-blue-600 hover:underline">Read the blog →</a></li>
+        <div class="rounded-card border border-primary-border bg-primary-soft p-5">
+          <p class="text-sm font-semibold text-ink">Prefer to browse first?</p>
+          <ul class="mt-3 space-y-1 text-sm">
+            <li><a href="/services.html" class="inline-block py-1">View all services →</a></li>
+            <li><a href="/case-studies.html" class="inline-block py-1">Read case studies →</a></li>
+            <li><a href="/blog.html" class="inline-block py-1">Read the blog →</a></li>
           </ul>
         </div>
       </aside>
     </div>
   </Container>
+  <script id="session-titles" type="application/json" set:html={JSON.stringify(Object.fromEntries(sessions.map((s) => [s.id, s.data.title])))}></script>
 </BaseLayout>
+
+<script>
+  import { siteConfig } from "../config/site";
+
+  // /contact.html?session=<id> comes from a consulting "Book" button whose online booking isn't set up yet.
+  const sessionId = new URLSearchParams(location.search).get("session");
+  const titles: Record<string, string> = JSON.parse(document.getElementById("session-titles")?.textContent ?? "{}");
+  const title = sessionId ? titles[sessionId] : undefined;
+  const notice = document.querySelector<HTMLElement>("[data-session-notice]");
+  if (title && notice) {
+    notice.querySelector("[data-session-title]")!.textContent = title;
+    const link = notice.querySelector<HTMLAnchorElement>("[data-session-mailto]");
+    if (link) {
+      const subject = encodeURIComponent(`Booking request: ${title}`);
+      const body = encodeURIComponent(`Hi Nidhi,\n\nI'd like to book: ${title}.\nPreferred dates/times (with time zone):\n\nWhat I'd like to cover:\n`);
+      link.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
+    }
+    notice.hidden = false;
+  }
+</script>

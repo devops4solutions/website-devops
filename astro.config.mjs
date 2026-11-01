@@ -3,6 +3,7 @@ import { defineConfig, envField } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import { features } from "./src/config/site.ts";
 
 const SITE = "https://devops4solutions.com";
 
@@ -14,6 +15,9 @@ const noindexVideoPaths = new Set(
 		.filter((source) => /^noindex:\s*true\b/m.test(source))
 		.map((source) => `/videos/${source.match(/^slug:\s*"?([^"\s]+)"?/m)?.[1]}`),
 );
+
+// Pages that exist but are switched off by a feature flag stay out of the sitemap (they are also noindex).
+const flaggedOffPaths = new Set([...(features.consulting ? [] : ["/consulting"])]);
 
 // Pages are built as /<path>.html (build.format "file") and the host only serves those paths,
 // so sitemap URLs must carry the .html extension to match the canonical tags.
@@ -33,7 +37,10 @@ export default defineConfig({
 	integrations: [
 		mdx(),
 		sitemap({
-			filter: (page) => !noindexVideoPaths.has(new URL(page).pathname.replace(/\/$/, "")),
+			filter: (page) => {
+				const path = new URL(page).pathname.replace(/\/$/, "");
+				return !noindexVideoPaths.has(path) && !flaggedOffPaths.has(path);
+			},
 			serialize: (item) => ({ ...item, url: toPublishedUrl(item.url) }),
 		}),
 	],

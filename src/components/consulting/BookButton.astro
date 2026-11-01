@@ -1,0 +1,39 @@
+---
+// Booking button for a consulting session.
+//  - calLink:    opens the Cal.com booking pop-up (falls back to the Cal.com page without JavaScript)
+//  - bookingUrl: external purchase link, e.g. a Stripe subscription Payment Link
+//  - neither:    contact page with the session pre-filled
+import type { CollectionEntry } from "astro:content";
+import { siteConfig } from "../../config/site";
+
+interface Props {
+  session: CollectionEntry<"sessions">;
+  variant?: "primary" | "secondary";
+}
+
+const { session, variant = "primary" } = Astro.props;
+const { calLink, bookingUrl, cta } = session.data;
+
+const href = calLink
+  ? `${siteConfig.cal.origin}/${calLink}`
+  : bookingUrl ?? `/contact.html?session=${encodeURIComponent(session.id)}`;
+const external = Boolean(calLink || bookingUrl);
+
+const classes =
+  variant === "primary"
+    ? "bg-primary text-white hover:bg-primary-hover hover:text-white"
+    : "border border-primary-border bg-surface text-primary hover:border-primary hover:bg-primary-soft";
+---
+
+<a
+  href={href}
+  class={`inline-flex min-h-11 w-full items-center justify-center rounded-full px-5 text-sm font-semibold no-underline transition hover:no-underline ${classes}`}
+  data-cal-link={calLink}
+  data-session={session.id}
+  data-track-event="Book session"
+  data-track-location={session.id}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+>
+  {cta}{external && !calLink && <span class="sr-only"> (opens in a new tab)</span>}
+</a>

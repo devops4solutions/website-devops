@@ -54,6 +54,11 @@ export const siteConfig = {
   postsPerPage: 9,
   /** X (Twitter) handle for the twitter:site meta tag, e.g. "@devops4solutions". Leave empty if none. */
   xHandle: "",
+  /** Cal.com embed. Change only if you self-host Cal.com. Event links live in src/data/sessions.yaml. */
+  cal: {
+    origin: "https://cal.com",
+    embedScript: "https://app.cal.com/embed/embed.js",
+  },
   comments: {
     /**
      * "custom" loads /giscus-theme.css (site colours) in production builds; it needs a CORS header on

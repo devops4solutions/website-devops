@@ -1,5 +1,5 @@
 import { defineCollection } from "astro:content";
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 // Pinned in frontmatter so renaming a file never changes a published URL.
@@ -76,8 +76,29 @@ const videos = defineCollection({
   }),
 });
 
+// Consulting session types for /consulting.html (src/data/sessions.yaml).
+const sessions = defineCollection({
+  loader: file("./src/data/sessions.yaml"),
+  schema: z.object({
+    id: slug,
+    order: z.number().int(), // display order on the page (the file loader does not keep file order)
+    title: z.string(),
+    summary: z.string(),
+    durationMin: z.number().int().positive().optional(),
+    billing: z.enum(["one-off", "monthly"]),
+    price: z.object({ amount: z.number().positive(), currency: z.enum(["USD", "INR", "EUR", "GBP"]) }).optional(),
+    calLink: z.string().regex(/^[\w.-]+\/[\w.-]+$/, 'calLink must look like "username/event-slug"').optional(),
+    bookingUrl: z.url().optional(),
+    includes: z.array(z.string()).default([]),
+    bestFor: z.string().optional(),
+    cta: z.string().default("Book now"),
+    featured: z.boolean().default(false),
+  }),
+});
+
 export const collections = {
   blog,
   caseStudies,
   videos,
+  sessions,
 };

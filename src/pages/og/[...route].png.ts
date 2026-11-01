@@ -9,6 +9,7 @@ export const getStaticPaths = (async () => {
 
   return [
     { params: { route: "default" }, props: { title: "Scalable Cloud Platforms, Built for Production", eyebrow: "Enterprise AWS & DevOps" } },
+    { params: { route: "consulting" }, props: { title: "Work with an AWS & DevOps architect", eyebrow: "Consulting & mentoring" } },
     ...posts.map((post) => ({
       params: { route: `blog/${post.id}` },
       props: { title: post.data.title, eyebrow: post.data.category },

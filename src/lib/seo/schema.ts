@@ -100,3 +100,28 @@ export const breadcrumbSchema = (items: { name: string; url: string }[]) => ({
   "@type": "BreadcrumbList",
   itemListElement: items.map((item, index) => ({ "@type": "ListItem", position: index + 1, name: item.name, item: item.url })),
 });
+
+interface SessionOffer {
+  name: string;
+  description: string;
+  url: string;
+  price?: { amount: number; currency: string };
+}
+
+/** Consulting page: the service with one Offer per session type (prices only when published). */
+export const consultingSchema = (pageUrl: string, sessions: SessionOffer[]) => ({
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "AWS & DevOps consulting and mentoring",
+  serviceType: "IT consulting",
+  url: pageUrl,
+  areaServed: "Worldwide",
+  provider: { "@type": "Organization", "@id": ORG_ID, name: siteConfig.name, url: `${SITE}/` },
+  offers: sessions.map((session) => ({
+    "@type": "Offer",
+    name: session.name,
+    description: session.description,
+    url: session.url,
+    ...(session.price ? { price: session.price.amount, priceCurrency: session.price.currency } : {}),
+  })),
+});
