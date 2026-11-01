@@ -67,7 +67,7 @@ The email address comes from `siteConfig.email` in `src/config/site.ts`. Change 
 
 # Project requests (/hire-me), payments (/pay) and security headers
 
-Both pages are built but **switched off** (`features.hireMe`, `features.pay`): they're `noindex`, unlinked, and kept out of the sitemap and search until you turn them on. Preview them at http://localhost:4321/hire-me.html and http://localhost:4321/pay.html.
+`/hire-me.html` is **on** (`features.hireMe: true`) and runs in **email mode** until you add a Web3Forms key: after validation, submitting opens the visitor's email app with every field filled in. Adding the key switches it to online submission with the thank-you page, with no other change. `/pay.html` is built but **switched off** (`features.pay`). Preview it at http://localhost:4321/pay.html.
 
 ## 7. Form service: why Web3Forms
 
@@ -94,7 +94,7 @@ Both pages are built but **switched off** (`features.hireMe`, `features.pay`): t
 3. Optional, recommended once spam appears:
    - in the Web3Forms dashboard, enable **hCaptcha**
    - set `hireMe.hcaptcha: true`
-4. Turn the page on: `features.hireMe: true`. This adds "Hire me for a project" to the header and footer, and the contact page's "Start a project" card and the consulting page's project button then link to it. The build refuses to turn it on without an access key.
+4. `features.hireMe` is already on, so "Hire me for a project" is in the header and footer, and the contact page's "Start a project" card and the consulting page's project button link to it. With the key in place the form submits online; without it the build prints a reminder and the form stays in email mode.
 5. Run `npm run build && npm run check:urls`, deploy, and send yourself a test request.
 
 **How spam is handled:**

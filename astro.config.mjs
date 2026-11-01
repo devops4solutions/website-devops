@@ -87,7 +87,8 @@ export default defineConfig({
 				"font-src 'self'",
 				`connect-src 'self' ${[...csp.web3forms, ...csp.cal, ...csp.hcaptcha, ...analyticsOrigins].join(" ")}`,
 				`frame-src ${[...csp.youtube, ...csp.giscus, ...csp.cal, ...csp.stripe, ...csp.hcaptcha].join(" ")}`,
-				`form-action 'self' ${csp.web3forms.join(" ")}`,
+				// mailto: lets the project form fall back to the visitor's email app (email mode / no JavaScript).
+				`form-action 'self' mailto: ${csp.web3forms.join(" ")}`,
 				"base-uri 'self'",
 				"object-src 'none'",
 				"upgrade-insecure-requests",

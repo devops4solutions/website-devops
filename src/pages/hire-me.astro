@@ -4,9 +4,9 @@ import Container from "../components/common/Container.astro";
 import ProjectRequestForm from "../components/hire-me/ProjectRequestForm.astro";
 import { features, siteConfig } from "../config/site";
 
-// Guard: never publish the form linked from the navigation without a Web3Forms access key.
+// Without a Web3Forms access key the form works in email mode (opens a pre-filled email); remind at build time.
 if (features.hireMe && !siteConfig.hireMe.web3formsAccessKey) {
-  throw new Error("features.hireMe is on but siteConfig.hireMe.web3formsAccessKey is empty (src/config/site.ts).");
+  console.warn("[hire-me] No Web3Forms access key: the project form is in email mode. Set hireMe.web3formsAccessKey in src/config/site.ts.");
 }
 
 const live = features.hireMe;

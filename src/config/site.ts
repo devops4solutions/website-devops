@@ -8,8 +8,8 @@ export const features = {
   learn: false,
   /** /consulting.html with session types and Cal.com booking (roadmap 1.3). */
   consulting: true,
-  /** /hire-me.html project request form (needs `hireMe.web3formsAccessKey` below). */
-  hireMe: false,
+  /** /hire-me.html project request form. Without `hireMe.web3formsAccessKey` it works in email mode. */
+  hireMe: true,
   /** /pay.html: how invoices are paid, plus fixed-price Stripe Payment Links. */
   pay: false,
   /** Show Razorpay Payment Links (UPI) next to the Stripe ones on /pay.html. */
@@ -59,7 +59,7 @@ export const siteConfig = {
   /**
    * Project request form on /hire-me.html, submitted directly to Web3Forms (no server code here).
    * The access key is public by design: it only lets this form send email to the address you
-   * registered at web3forms.com. Leave empty until you have one; the page then offers email instead.
+   * registered at web3forms.com. While empty, the form opens a pre-filled email instead of submitting online.
    */
   hireMe: {
     formEndpoint: "https://api.web3forms.com/submit",

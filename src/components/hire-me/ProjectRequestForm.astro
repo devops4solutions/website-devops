@@ -2,9 +2,13 @@
 // Project request form. Posts directly to Web3Forms (siteConfig.hireMe); there is no server code on this site.
 // With JavaScript: client-side validation, submission via fetch, then redirect to the thank-you page.
 // Without JavaScript: native validation and a normal POST; Web3Forms redirects to the thank-you page.
+// Until a Web3Forms access key is configured, the form runs in email mode: after validation it opens
+// the visitor's email app with the details pre-filled (a plain mailto: form without JavaScript).
 import { siteConfig } from "../../config/site";
 
 const config = siteConfig.hireMe;
+const online = Boolean(config.web3formsAccessKey);
+const attachments = online && config.attachments;
 const thanksUrl = `${siteConfig.siteUrl}/hire-me/thanks.html`;
 const MAX_FILE_MB = 5;
 
@@ -17,21 +21,25 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
 <form
   id="project-request"
   class="space-y-7"
-  action={config.formEndpoint}
+  action={online ? config.formEndpoint : `mailto:${siteConfig.email}?subject=Project%20request`}
   method="POST"
-  enctype={config.attachments ? "multipart/form-data" : undefined}
+  enctype={attachments ? "multipart/form-data" : online ? undefined : "text/plain"}
   data-endpoint={config.formEndpoint}
-  data-configured={config.web3formsAccessKey ? "true" : "false"}
+  data-configured={online ? "true" : "false"}
   data-thanks="/hire-me/thanks.html"
   data-max-file-mb={MAX_FILE_MB}
 >
-  <!-- Web3Forms settings -->
-  <input type="hidden" name="access_key" value={config.web3formsAccessKey} />
-  <input type="hidden" name="subject" value="New project request from devops4solutions.com" />
-  <input type="hidden" name="from_name" value="DevOps4Solutions website" />
-  <input type="hidden" name="redirect" value={thanksUrl} />
-  <!-- Honeypot: real visitors never see or tick this; submissions with it ticked are discarded. -->
-  <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  {online && (
+    <>
+      <!-- Web3Forms settings -->
+      <input type="hidden" name="access_key" value={config.web3formsAccessKey} />
+      <input type="hidden" name="subject" value="New project request from devops4solutions.com" />
+      <input type="hidden" name="from_name" value="DevOps4Solutions website" />
+      <input type="hidden" name="redirect" value={thanksUrl} />
+      <!-- Honeypot: real visitors never see or tick this; submissions with it ticked are discarded. -->
+      <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    </>
+  )}
 
   <div data-error-summary class="rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800" role="alert" tabindex="-1" hidden>
     <p class="font-semibold">Please fix the following:</p>
@@ -102,7 +110,7 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
     </div>
   </div>
 
-  {config.attachments ? (
+  {attachments ? (
     <div>
       <label for="attachment" class={labelClass}>Attachment <span class="font-normal text-muted">(optional)</span></label>
       <p id="attachment-hint" class="mt-1 text-sm text-muted">One file up to {MAX_FILE_MB} MB: PDF, image, Word, or ZIP.</p>
@@ -133,7 +141,15 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
     </span>
   </label>
 
-  {config.hcaptcha && <div class="h-captcha" data-captcha="true"></div>}
+  {online && config.hcaptcha && <div class="h-captcha" data-captcha="true"></div>}
+
+  {!online && (
+    <p class="rounded-card border border-primary-border bg-primary-soft p-4 text-sm text-ink">
+      Submitting opens your email app with these details filled in, ready to send to {siteConfig.email}.
+    </p>
+  )}
+
+  <div data-mail-status class="rounded-card border border-primary-border bg-primary-soft p-4 text-sm text-ink" role="status" tabindex="-1" hidden></div>
 
   <div data-submit-error class="rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800" role="alert" tabindex="-1" hidden></div>
 
@@ -142,15 +158,16 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
       type="submit"
       class="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-7 text-base font-semibold text-white transition hover:bg-primary-hover disabled:cursor-wait disabled:opacity-70"
     >
-      <span data-submit-label>Send project request</span>
+      <span data-submit-label>{online ? "Send project request" : "Email project details"}</span>
     </button>
     <p class="text-xs text-muted">
-      Sent to {siteConfig.author.name} by email via Web3Forms and used only to reply. See the <a href="/privacy.html">privacy policy</a>.
+      {online ? `Sent to ${siteConfig.author.name} by email via Web3Forms` : `Sent from your own email app to ${siteConfig.author.name}`} and used only
+      to reply. See the <a href="/privacy.html">privacy policy</a>.
     </p>
   </div>
 </form>
 
-{config.hcaptcha && <script is:inline src="https://web3forms.com/client/script.js" async defer></script>}
+{online && config.hcaptcha && <script is:inline src="https://web3forms.com/client/script.js" async defer></script>}
 
 <script>
   import { siteConfig } from "../../config/site";
@@ -280,10 +297,12 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
         `Timeline: ${data.get("Timeline") ?? ""}`,
         `Cloud / platform: ${data.get("Cloud platform") ?? ""}`,
         `NDA requested: ${data.get("NDA requested") ? "Yes" : "No"}`,
+        ...(data.get("Files link") ? [`Files: ${data.get("Files link")}`] : []),
         "",
         String(data.get("message") ?? ""),
         "",
         `${data.get("name") ?? ""}`,
+        `${data.get("email") ?? ""}`,
       ].join("\n");
       return `mailto:${siteConfig.email}?subject=${encodeURIComponent("Project request")}&body=${encodeURIComponent(body)}`;
     };
@@ -314,7 +333,15 @@ const errorClass = "field-error mt-1.5 text-sm font-medium text-red-700";
       }
 
       if (form.dataset.configured !== "true") {
-        fail("The online form isn't set up yet. Your details are still here, so you can send them by email.");
+        // Email mode: open the visitor's email app with everything filled in.
+        const link = document.createElement("a");
+        link.href = mailtoFallback();
+        link.click();
+        track("Project request email", { types: new FormData(form).getAll("Project type").join(", ") });
+        const status = form.querySelector<HTMLElement>("[data-mail-status]")!;
+        status.textContent = `Your email app should now open with your request filled in; just press send. If nothing happens, email ${siteConfig.email} and paste your description.`;
+        status.hidden = false;
+        status.focus();
         return;
       }
 
