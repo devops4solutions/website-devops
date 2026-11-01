@@ -1,44 +1,42 @@
 ---
-import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import ContentLayout from "../../layouts/ContentLayout.astro";
-import BlogCard from "../../components/content/BlogCard.astro";
+import PostListing from "../../components/blog/PostListing.astro";
+import { getPublishedPosts } from "../../lib/content/queries";
+import { pageUrl, paginate, tagCounts } from "../../lib/content/blog";
 import { slugify } from "../../utils/content";
+import { siteConfig } from "../../config/site";
 
+// Page 1 of each tag at /tags/<tag>.html. Later pages: src/pages/tags/[tag]/page/[page].astro
 export async function getStaticPaths() {
-  const posts = (await getCollection("blog") as CollectionEntry<"blog">[]).filter(
-    (post: CollectionEntry<"blog">) => !post.data.draft,
-  );
-
-  const tags = [...new Set(posts.flatMap((post: CollectionEntry<"blog">) => post.data.tags))];
-
-  return tags.map((tag: string) => ({
-    params: { tag: slugify(tag) },
-    props: { tag, posts },
-  }));
+  const posts = await getPublishedPosts();
+  return tagCounts(posts).map(({ tag, slug }) => {
+    const matches = posts.filter((post) => post.data.tags.some((entry) => slugify(entry) === slug));
+    const pages = paginate(matches, siteConfig.postsPerPage);
+    return { params: { tag: slug }, props: { tag, pagePosts: pages[0], allPosts: posts, lastPage: pages.length } };
+  });
 }
 
 interface Props {
   tag: string;
-  posts: CollectionEntry<"blog">[];
+  pagePosts: CollectionEntry<"blog">[];
+  allPosts: CollectionEntry<"blog">[];
+  lastPage: number;
 }
 
-const { tag, posts } = Astro.props;
-
-const matches = posts
-  .filter((post: CollectionEntry<"blog">) => post.data.tags.some((entry: string) => slugify(entry) === slugify(tag)))
-  .sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const { tag, pagePosts, allPosts, lastPage } = Astro.props;
+const base = `/tags/${Astro.params.tag}`;
 ---
 
-<BaseLayout title={`${tag} Articles | DevOps4Solutions`} description={`Articles tagged ${tag}.`}>
-  <ContentLayout
-    breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }, { label: "Tags" }, { label: tag }]}
-    title={`Tag: ${tag}`}
-    description={`Articles matching tag ${tag}.`}
-  >
-    <div class="grid gap-4 md:grid-cols-2">
-      {matches.map((post: CollectionEntry<"blog">) => <BlogCard post={post} />)}
-    </div>
-  </ContentLayout>
+<BaseLayout title={`${tag} Articles | DevOps4Solutions`} description={`Articles about ${tag} on AWS, DevOps and platform engineering.`}>
+  <PostListing
+    heading={`#${tag}`}
+    intro={`Articles tagged ${tag}.`}
+    breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }, { label: "Tags", href: "/tags.html" }, { label: tag }]}
+    posts={pagePosts}
+    allPosts={allPosts}
+    currentPage={1}
+    lastPage={lastPage}
+    urlFor={(page) => pageUrl(base, page)}
+  />
 </BaseLayout>

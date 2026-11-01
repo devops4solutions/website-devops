@@ -1,9 +1,15 @@
-import { defineCollection, z } from "astro:content";
-import { glob } from "astro/loaders";
+import { defineCollection } from "astro:content";
+import { file, glob } from "astro/loaders";
+import { z } from "astro/zod";
+
+// Pinned in frontmatter so renaming a file never changes a published URL.
+// The glob loader uses `slug` as the entry id.
+const slug = z.string().regex(/^[a-z0-9_-]+$/, "slug must be lowercase letters, digits, - or _");
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/data/blog" }),
   schema: z.object({
+    slug,
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
@@ -15,14 +21,25 @@ const blog = defineCollection({
     imageAlt: z.string().optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
-    readingTime: z.string().optional(),
-    canonicalUrl: z.string().url().optional(),
+    readingTime: z.string().optional(), // optional override; otherwise computed from the post body
+    canonicalUrl: z.url().optional(),
+    comments: z.boolean().default(true), // set false to hide Giscus comments on this post
+    // Optional call-to-action box at the end of the post, pointing to a course or learning resource.
+    relatedCourse: z
+      .object({
+        title: z.string(),
+        url: z.string(),
+        description: z.string().optional(),
+        cta: z.string().default("View course"),
+      })
+      .optional(),
   }),
 });
 
 const caseStudies = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/data/case-studies" }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
+    slug,
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
@@ -34,7 +51,7 @@ const caseStudies = defineCollection({
     challenge: z.string(),
     solution: z.string(),
     outcome: z.string(),
-    image: z.string().optional(),
+    image: image().optional(),
     imageAlt: z.string().optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
@@ -44,6 +61,7 @@ const caseStudies = defineCollection({
 const videos = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/data/videos" }),
   schema: z.object({
+    slug,
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
@@ -53,7 +71,28 @@ const videos = defineCollection({
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
+    noindex: z.boolean().default(false),
     duration: z.string().optional(),
+  }),
+});
+
+// Consulting session types for /consulting.html (src/data/sessions.yaml).
+const sessions = defineCollection({
+  loader: file("./src/data/sessions.yaml"),
+  schema: z.object({
+    id: slug,
+    order: z.number().int(), // display order on the page (the file loader does not keep file order)
+    title: z.string(),
+    summary: z.string(),
+    durationMin: z.number().int().positive().optional(),
+    billing: z.enum(["one-off", "monthly"]),
+    price: z.object({ amount: z.number().positive(), currency: z.enum(["USD", "INR", "EUR", "GBP"]) }).optional(),
+    calLink: z.string().regex(/^[\w.-]+\/[\w.-]+$/, 'calLink must look like "username/event-slug"').optional(),
+    bookingUrl: z.url().optional(),
+    includes: z.array(z.string()).default([]),
+    bestFor: z.string().optional(),
+    cta: z.string().default("Book now"),
+    featured: z.boolean().default(false),
   }),
 });
 
@@ -61,4 +100,5 @@ export const collections = {
   blog,
   caseStudies,
   videos,
+  sessions,
 };

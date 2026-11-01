@@ -1,48 +1,53 @@
 ---
 import Container from "./Container.astro";
-import { siteConfig } from "../../data/site";
+import { footerNav, siteConfig, visibleLinks } from "../../config/site";
 
 const year = new Date().getFullYear();
+const columns = footerNav.map((column) => ({ ...column, links: visibleLinks(column.links) }));
+const socials = Object.values(siteConfig.social);
 ---
 
-<footer class="border-t border-slate-100 bg-white" data-pagefind-ignore>
+<footer class="border-t border-border bg-surface" data-pagefind-ignore>
   <Container className="py-10">
-    <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Services</p>
-        <ul class="space-y-2 text-sm">
-          {siteConfig.footer.services.map((item) => (
-            <li><a href={item.href} class="text-slate-600 hover:text-blue-600">{item.label}</a></li>
-          ))}
-        </ul>
+        <a href="/" class="inline-block py-1 text-lg font-bold text-brand-navy no-underline hover:no-underline">{siteConfig.name}</a>
+        <p class="mt-2 text-sm text-ink-soft">{siteConfig.tagline}</p>
+        <p class="mt-3 text-sm">
+          <a href={`mailto:${siteConfig.email}`} class="inline-block py-1.5 break-all">{siteConfig.email}</a>
+        </p>
       </div>
-      <div>
-        <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Content</p>
-        <ul class="space-y-2 text-sm">
-          {siteConfig.footer.content.map((item) => (
-            <li><a href={item.href} class="text-slate-600 hover:text-blue-600" target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined}>{item.label}</a></li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Connect</p>
-        <ul class="space-y-2 text-sm">
-          <li><a href={siteConfig.youtubeUrl} class="text-slate-600 hover:text-blue-600" target="_blank" rel="noreferrer">YouTube</a></li>
-          <li><a href={siteConfig.linkedinUrl} class="text-slate-600 hover:text-blue-600" target="_blank" rel="noreferrer">LinkedIn</a></li>
-          <li><a href={siteConfig.instagramUrl} class="text-slate-600 hover:text-blue-600" target="_blank" rel="noreferrer">Instagram</a></li>
-          <li><a href="/contact.html" class="text-slate-600 hover:text-blue-600">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Company</p>
-        <ul class="space-y-2 text-sm">
-          <li><a href="/about.html" class="text-slate-600 hover:text-blue-600">About</a></li>
-          <li><a href="/privacy.html" class="text-slate-600 hover:text-blue-600">Privacy</a></li>
-        </ul>
-      </div>
+
+      {columns.map((column) => (
+        <nav aria-label={column.title}>
+          <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">{column.title}</p>
+          <ul class="space-y-1 text-sm">
+            {column.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="inline-block py-1.5 text-ink-soft hover:text-primary"
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noreferrer" : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))}
     </div>
-    <p class="mt-8 border-t border-slate-100 pt-6 text-xs text-slate-400">
-      © {year} DevOps4Solutions. All rights reserved.
-    </p>
+
+    <div class="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-muted">© {year} {siteConfig.name}. All rights reserved.</p>
+      <ul class="flex flex-wrap gap-x-5 gap-y-1 text-sm" aria-label="Social media">
+        {socials.map((profile) => (
+          <li>
+            <a href={profile.url} class="inline-block py-1.5 text-ink-soft hover:text-primary" target="_blank" rel="noreferrer">{profile.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </Container>
 </footer>

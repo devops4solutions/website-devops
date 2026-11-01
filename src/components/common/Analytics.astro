@@ -1,0 +1,25 @@
+---
+// Privacy-friendly analytics (Plausible or Umami), production builds only.
+// Configure one provider through environment variables (see .env.example). Plausible wins if both are set.
+import {
+  PUBLIC_PLAUSIBLE_DOMAIN,
+  PUBLIC_PLAUSIBLE_SCRIPT_URL,
+  PUBLIC_UMAMI_SCRIPT_URL,
+  PUBLIC_UMAMI_WEBSITE_ID,
+} from "astro:env/client";
+
+const enabled = import.meta.env.PROD;
+const plausible = enabled && PUBLIC_PLAUSIBLE_DOMAIN ? { domain: PUBLIC_PLAUSIBLE_DOMAIN, src: PUBLIC_PLAUSIBLE_SCRIPT_URL } : null;
+const umami = enabled && !plausible && PUBLIC_UMAMI_WEBSITE_ID && PUBLIC_UMAMI_SCRIPT_URL
+  ? { id: PUBLIC_UMAMI_WEBSITE_ID, src: PUBLIC_UMAMI_SCRIPT_URL }
+  : null;
+---
+
+{plausible && (
+  <>
+    <script is:inline defer data-domain={plausible.domain} src={plausible.src}></script>
+    <!-- Queue custom events fired before the script finishes loading. -->
+    <script is:inline>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };</script>
+  </>
+)}
+{umami && <script is:inline defer data-website-id={umami.id} src={umami.src}></script>}

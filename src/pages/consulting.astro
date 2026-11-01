@@ -1,0 +1,128 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/common/Container.astro";
+import Button from "../components/common/Button.astro";
+import SessionCard from "../components/consulting/SessionCard.astro";
+import CalEmbed from "../components/consulting/CalEmbed.astro";
+import { features, siteConfig } from "../config/site";
+import { consultingSchema } from "../lib/seo/schema";
+
+const sessions = (await getCollection("sessions")).sort((a, b) => a.data.order - b.data.order);
+const pageUrl = `${siteConfig.siteUrl}/consulting.html`;
+
+// Until `features.consulting` is on, the page builds (so it can be reviewed) but stays out of
+// navigation, search engines, the sitemap and site search.
+const live = features.consulting;
+
+const steps = [
+  { title: "Pick a session", text: "Choose the session that fits and book a time that works for you." },
+  { title: "Share context", text: "Send a short summary, diagrams or a repository link beforehand so the call starts on the real problem." },
+  { title: "Get clear next steps", text: "We work through it together and you leave with concrete recommendations." },
+];
+
+const faqs = [
+  {
+    q: "Which session should I choose?",
+    a: "Start with the intro call if you are not sure whether I can help. Book the architecture deep dive when you already have a specific problem to solve.",
+  },
+  {
+    q: "What should I prepare?",
+    a: "A short description of the goal, your current setup and any constraints. Architecture diagrams, Terraform code or a repository link help make the most of the time.",
+  },
+  {
+    q: "What if my problem needs more than one session?",
+    a: "Book another session, move to monthly advisory, or send a project request for a fixed-scope engagement.",
+  },
+  {
+    q: "Do you work with teams as well as individuals?",
+    a: "Yes. Deep dives and advisory are designed for teams; mentoring is one-to-one.",
+  },
+];
+---
+
+<BaseLayout
+  title="Consulting & Mentoring | DevOps4Solutions"
+  description="Book AWS, Terraform, Kubernetes and DevOps consulting, architecture deep dives, 1:1 mentoring or monthly advisory with Nidhi Gupta."
+  ogImage="/og/consulting.png"
+  noindex={!live}
+>
+  {live && <script type="application/ld+json" set:html={JSON.stringify(consultingSchema(pageUrl, sessions.map((s) => ({ name: s.data.title, description: s.data.summary, url: `${pageUrl}#session-${s.id}`, price: s.data.price }))))}></script>}
+
+  <section class="border-b border-border bg-surface py-12 sm:py-16">
+    <Container>
+      <div class="max-w-3xl">
+        <p class="eyebrow mb-3">Consulting &amp; mentoring</p>
+        <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-5xl">Work with an AWS &amp; DevOps architect</h1>
+        <p class="mt-5 text-lg text-ink-soft">
+          Get expert help on AWS architecture, Terraform, Kubernetes and CI/CD from {siteConfig.author.name} ({siteConfig.author.jobTitle}), with 16+ years of enterprise experience.
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button href="#sessions">See session options</Button>
+          <Button href="/contact.html" variant="secondary">Ask a question first</Button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <section id="sessions" class="scroll-mt-20 py-12 sm:py-16" aria-labelledby="sessions-heading">
+    <Container>
+      <h2 id="sessions-heading" class="text-2xl font-bold text-ink sm:text-3xl">Choose a session</h2>
+      <p class="mt-2 text-ink-soft">Book directly in my calendar. You'll get a confirmation email with the meeting link.</p>
+      <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {sessions.map((session) => <SessionCard session={session} />)}
+      </div>
+    </Container>
+  </section>
+
+  <section class="border-y border-border bg-surface py-12 sm:py-16" aria-labelledby="how-heading">
+    <Container>
+      <h2 id="how-heading" class="text-2xl font-bold text-ink sm:text-3xl">How it works</h2>
+      <ol class="mt-8 grid gap-6 md:grid-cols-3">
+        {steps.map((step, index) => (
+          <li class="rounded-card border border-border bg-surface-muted p-6">
+            <span class="inline-flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-white" aria-hidden="true">{index + 1}</span>
+            <h3 class="mt-4 text-lg font-semibold text-ink">{step.title}</h3>
+            <p class="mt-2 text-sm text-ink-soft">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </Container>
+  </section>
+
+  <section class="py-12 sm:py-16" aria-labelledby="faq-heading">
+    <Container>
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <div>
+          <h2 id="faq-heading" class="text-2xl font-bold text-ink sm:text-3xl">Questions</h2>
+          <p class="mt-2 text-ink-soft">Something else? <a href="/contact.html" class="inline-block py-1">Get in touch</a>.</p>
+        </div>
+        <div class="divide-y divide-border rounded-card border border-border bg-surface">
+          {faqs.map((faq) => (
+            <details class="group">
+              <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-3 font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                {faq.q}
+                <span aria-hidden="true" class="text-xl text-muted transition group-open:rotate-45">+</span>
+              </summary>
+              <p class="px-5 pb-5 text-sm text-ink-soft">{faq.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <section class="pb-16">
+    <Container>
+      <div class="flex flex-col items-start justify-between gap-5 rounded-card border border-primary-border bg-primary-soft p-7 sm:flex-row sm:items-center">
+        <div>
+          <h2 class="text-xl font-bold text-ink">Need a fixed-scope project instead?</h2>
+          <p class="mt-1 text-sm text-ink-soft">Migrations, landing zones, Terraform modules, EKS platforms and CI/CD pipelines.</p>
+        </div>
+        <Button href={features.hireMe ? "/hire-me.html" : "/contact.html#project"} class="shrink-0">Start a project</Button>
+      </div>
+    </Container>
+  </section>
+
+  <CalEmbed />
+</BaseLayout>

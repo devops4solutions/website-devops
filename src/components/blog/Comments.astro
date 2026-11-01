@@ -1,0 +1,93 @@
+---
+// Giscus comments (GitHub Discussions), loaded only when the reader scrolls near them.
+// Renders nothing unless all four PUBLIC_GISCUS_* variables are set (see .env.example).
+import {
+  PUBLIC_GISCUS_CATEGORY,
+  PUBLIC_GISCUS_CATEGORY_ID,
+  PUBLIC_GISCUS_REPO,
+  PUBLIC_GISCUS_REPO_ID,
+} from "astro:env/client";
+import { siteConfig } from "../../config/site";
+
+interface Props {
+  /** Stable thread key: the post slug, so retitling a post keeps its comments. */
+  term: string;
+}
+
+const { term } = Astro.props;
+const configured = PUBLIC_GISCUS_REPO && PUBLIC_GISCUS_REPO_ID && PUBLIC_GISCUS_CATEGORY && PUBLIC_GISCUS_CATEGORY_ID;
+
+// The custom theme is served from the live site (Giscus loads it inside its iframe), so it is only
+// used in production builds. Development falls back to Giscus's built-in light theme.
+const theme = siteConfig.comments.theme === "custom" && import.meta.env.PROD ? `${siteConfig.siteUrl}/giscus-theme.css` : "light";
+---
+
+{configured && (
+  <section id="comments" class="mt-12 scroll-mt-24" aria-labelledby="comments-heading" data-pagefind-ignore>
+    <h2 id="comments-heading" class="text-xl font-semibold text-ink">Comments</h2>
+    <p class="mt-1 text-sm text-muted">Comments use GitHub Discussions. Sign in with GitHub to join the conversation.</p>
+    <div
+      class="giscus-container mt-6 min-h-40"
+      data-repo={PUBLIC_GISCUS_REPO}
+      data-repo-id={PUBLIC_GISCUS_REPO_ID}
+      data-category={PUBLIC_GISCUS_CATEGORY}
+      data-category-id={PUBLIC_GISCUS_CATEGORY_ID}
+      data-term={term}
+      data-theme={theme}
+    >
+      <p class="giscus-placeholder text-sm text-muted">Loading comments…</p>
+    </div>
+    <noscript><p class="text-sm text-muted">Comments need JavaScript.</p></noscript>
+  </section>
+)}
+
+<script>
+  const container = document.querySelector<HTMLElement>(".giscus-container");
+
+  const load = () => {
+    if (!container || container.dataset.loaded) return;
+    container.dataset.loaded = "true";
+    const d = container.dataset;
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    const attributes: Record<string, string> = {
+      "data-repo": d.repo ?? "",
+      "data-repo-id": d.repoId ?? "",
+      "data-category": d.category ?? "",
+      "data-category-id": d.categoryId ?? "",
+      "data-mapping": "specific",
+      "data-term": d.term ?? "",
+      "data-strict": "1",
+      "data-reactions-enabled": "1",
+      "data-emit-metadata": "0",
+      "data-input-position": "top",
+      "data-theme": d.theme ?? "light",
+      "data-lang": "en",
+      "data-loading": "lazy",
+    };
+    for (const [name, value] of Object.entries(attributes)) script.setAttribute(name, value);
+    container.querySelector(".giscus-placeholder")?.remove();
+    container.appendChild(script);
+  };
+
+  if (container) {
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            load();
+          }
+        },
+        { rootMargin: "600px 0px" },
+      );
+      observer.observe(container);
+    } else {
+      load();
+    }
+    // Deep links to #comments load immediately.
+    if (location.hash === "#comments") load();
+  }
+</script>

@@ -1,0 +1,185 @@
+---
+// Site-wide search dialog backed by Pagefind. Opened by any element with [data-search-open]
+// (header icon, blog sidebar), or with Ctrl/⌘+K or "/". Full-screen on phones.
+// Pagefind's index exists only in production builds (`npm run build`); in dev the dialog says so.
+const filters = ["All", "Blog", "Case study", "Video", "Page"];
+---
+
+<dialog
+  id="site-search"
+  aria-labelledby="site-search-title"
+  class="m-0 h-dvh max-h-none w-full max-w-none bg-surface p-0 text-ink backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm sm:mx-auto sm:mt-[8vh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl sm:rounded-card sm:shadow-2xl"
+  data-pagefind-ignore
+>
+  <div class="flex h-full max-h-[inherit] flex-col">
+    <form role="search" class="flex items-center gap-2 border-b border-border p-3 sm:p-4" action="/search.html" method="get">
+      <h2 id="site-search-title" class="sr-only">Search the site</h2>
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="ml-1 size-5 shrink-0 text-muted" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.5-3.5"></path>
+      </svg>
+      <label for="site-search-input" class="sr-only">Search</label>
+      <input
+        id="site-search-input"
+        name="q"
+        type="search"
+        autocomplete="off"
+        enterkeyhint="search"
+        placeholder="Search AWS, Terraform, EKS…"
+        class="min-h-11 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-muted"
+      />
+      <button type="button" data-search-close class="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium text-ink-soft hover:bg-surface-muted">
+        Close<span class="sr-only"> search</span>
+      </button>
+    </form>
+
+    <div class="flex gap-2 overflow-x-auto border-b border-border px-3 py-2 sm:px-4" role="group" aria-label="Filter results by type">
+      {filters.map((filter, i) => (
+        <button
+          type="button"
+          data-search-filter={filter}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class="inline-flex min-h-9 shrink-0 items-center rounded-full border border-border px-3 text-sm text-ink-soft aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary"
+        >
+          {filter}
+        </button>
+      ))}
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
+      <p data-search-status class="px-1 text-sm text-muted" aria-live="polite">Type to search articles, case studies and videos.</p>
+      <ul data-search-results class="mt-2 space-y-2"></ul>
+    </div>
+
+    <p class="hidden border-t border-border px-4 py-2 text-xs text-muted sm:block">
+      <kbd class="rounded border border-border px-1">Esc</kbd> to close · <kbd class="rounded border border-border px-1">Ctrl</kbd>/<kbd class="rounded border border-border px-1">⌘</kbd>+<kbd class="rounded border border-border px-1">K</kbd> to open
+    </p>
+  </div>
+</dialog>
+
+<script>
+  import { track } from "../../lib/analytics/track";
+
+  type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string }; filters: { type?: string[] } }> };
+  type Pagefind = {
+    options: (opts: Record<string, unknown>) => Promise<void>;
+    debouncedSearch: (term: string, opts?: Record<string, unknown>, ms?: number) => Promise<{ results: PagefindResult[] } | null>;
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>("#site-search");
+  const input = dialog?.querySelector<HTMLInputElement>("#site-search-input");
+  const status = dialog?.querySelector<HTMLElement>("[data-search-status]");
+  const list = dialog?.querySelector<HTMLUListElement>("[data-search-results]");
+  const filterButtons = [...(dialog?.querySelectorAll<HTMLButtonElement>("[data-search-filter]") ?? [])];
+
+  let pagefind: Pagefind | null | undefined;
+  let activeFilter = "All";
+  let lastFocus: HTMLElement | null = null;
+
+  const loadPagefind = async (): Promise<Pagefind | null> => {
+    if (pagefind !== undefined) return pagefind;
+    try {
+      const url = "/pagefind/pagefind.js";
+      pagefind = (await import(/* @vite-ignore */ url)) as Pagefind;
+      await pagefind.options({ excerptLength: 24 });
+    } catch {
+      pagefind = null;
+    }
+    return pagefind;
+  };
+
+  const escapeHtml = (value: string) =>
+    value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c);
+  // Pagefind excerpts are escaped text with <mark> highlights; allow only those tags through.
+  const safeExcerpt = (html: string) => escapeHtml(html).replace(/&lt;(\/?)mark&gt;/g, "<$1mark>");
+
+  const search = async () => {
+    if (!input || !status || !list) return;
+    const term = input.value.trim();
+    if (!term) {
+      list.innerHTML = "";
+      status.textContent = "Type to search articles, case studies and videos.";
+      return;
+    }
+    const pf = await loadPagefind();
+    if (!pf) {
+      status.innerHTML = 'Search is available on the published site. <a href="/search.html">Open the search page</a>.';
+      return;
+    }
+    const response = await pf.debouncedSearch(term, activeFilter === "All" ? {} : { filters: { type: activeFilter } }, 250);
+    if (!response) return; // Superseded by a newer keystroke.
+    const items = await Promise.all(response.results.slice(0, 8).map((result) => result.data()));
+    status.textContent = items.length
+      ? `${response.results.length} result${response.results.length === 1 ? "" : "s"}`
+      : `No results for “${term}”.`;
+    list.innerHTML = items
+      .map(
+        (item) => `<li><a href="${escapeHtml(item.url)}" class="block rounded-lg border border-border p-3 no-underline hover:border-primary-border hover:bg-primary-soft hover:no-underline">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-primary">${escapeHtml(item.filters.type?.[0] ?? "Page")}</span>
+          <span class="mt-0.5 block font-semibold text-ink">${escapeHtml(item.meta.title ?? item.url)}</span>
+          <span class="mt-1 block text-sm text-ink-soft [&_mark]:bg-amber-100 [&_mark]:text-ink">${safeExcerpt(item.excerpt)}</span>
+        </a></li>`,
+      )
+      .join("");
+    if (response.results.length > 8) {
+      list.insertAdjacentHTML(
+        "beforeend",
+        `<li><a class="inline-block py-2 text-sm font-medium" href="/search.html?q=${encodeURIComponent(term)}">See all ${response.results.length} results →</a></li>`,
+      );
+    }
+  };
+
+  const open = () => {
+    if (!dialog || dialog.open) return;
+    lastFocus = document.activeElement as HTMLElement | null;
+    dialog.showModal();
+    document.documentElement.style.overflow = "hidden";
+    input?.focus();
+    input?.select();
+    void loadPagefind();
+    track("Search open", { page: location.pathname });
+  };
+
+  dialog?.addEventListener("close", () => {
+    document.documentElement.style.overflow = "";
+    lastFocus?.focus();
+  });
+  // Click on the backdrop closes the dialog.
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog?.querySelector("[data-search-close]")?.addEventListener("click", () => dialog.close());
+  input?.addEventListener("input", () => void search());
+
+  for (const button of filterButtons) {
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.searchFilter ?? "All";
+      for (const b of filterButtons) b.setAttribute("aria-pressed", String(b === button));
+      void search();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const trigger = (event.target as Element | null)?.closest?.("[data-search-open]");
+    if (trigger && dialog) {
+      event.preventDefault();
+      open();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    // Native <dialog> handles Esc, but Chrome can ignore repeat close requests on dialogs opened
+    // without a fresh user gesture; closing explicitly keeps Esc reliable.
+    if (event.key === "Escape" && dialog?.open) {
+      event.preventDefault();
+      dialog.close();
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    const typing = target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "");
+    if ((event.key === "k" && (event.metaKey || event.ctrlKey)) || (event.key === "/" && !typing)) {
+      event.preventDefault();
+      open();
+    }
+  });
+</script>

@@ -1,4 +1,5 @@
 ---
+slug: "ecs-fargate-microservices-platform"
 title: ECS Fargate Microservices Platform Foundation
 description: Standardizing container runtime operations using ECS and Fargate for enterprise workloads.
 pubDate: 2026-01-18
@@ -16,7 +17,7 @@ technologies:
 challenge: Containerized services lacked shared deployment and observability standards.
 solution: Defined reusable service templates and baseline operational controls on ECS Fargate.
 outcome: Delivery teams moved faster with consistent service definitions and runtime controls.
-image: /images/case-studies/ecs.svg
+image: ../../assets/images/case-studies/ecs.svg
 imageAlt: ECS and Fargate service topology
 featured: false
 draft: false

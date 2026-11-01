@@ -1,0 +1,47 @@
+---
+// Fixed-price Payment Link buttons. Links open the provider's hosted checkout (Stripe / Razorpay);
+// this site never sees card or UPI details. Entries without a URL are not rendered.
+interface PaymentLink {
+  label: string;
+  price: string;
+  description: string;
+  url: string;
+}
+
+interface Props {
+  provider: "Stripe" | "Razorpay";
+  links: readonly PaymentLink[];
+  note: string;
+}
+
+const { provider, links, note } = Astro.props;
+const visible = links.filter((link) => link.url.trim());
+---
+
+{visible.length > 0 && (
+  <section class="mt-10" aria-labelledby={`pay-${provider.toLowerCase()}`}>
+    <h2 id={`pay-${provider.toLowerCase()}`} class="text-xl font-semibold text-ink">
+      {provider === "Stripe" ? "Fixed-price items" : "Pay with UPI (Razorpay)"}
+    </h2>
+    <p class="mt-1 text-sm text-muted">{note}</p>
+    <ul class="mt-5 grid gap-4 sm:grid-cols-2">
+      {visible.map((link) => (
+        <li class="flex flex-col rounded-card border border-border bg-surface p-5 shadow-card">
+          <p class="font-semibold text-ink">{link.label}</p>
+          {link.price && <p class="mt-1 text-2xl font-bold text-ink">{link.price}</p>}
+          {link.description && <p class="mt-2 text-sm text-ink-soft">{link.description}</p>}
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track-event="Payment link"
+            data-track-location={`${provider}: ${link.label}`}
+            class="mt-auto inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white no-underline hover:bg-primary-hover hover:text-white hover:no-underline"
+          >
+            Pay with {provider}<span class="sr-only"> (opens {provider} checkout in a new tab)</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

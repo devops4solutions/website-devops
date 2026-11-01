@@ -1,4 +1,5 @@
 ---
+slug: "devops-aws-video-4"
 title: DevOps on AWS — Video 4
 description: Practical DevOps and AWS architecture guidance by Nidhi Gupta.
 pubDate: 2026-06-01

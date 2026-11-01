@@ -1,0 +1,61 @@
+# Consulting session types shown on /consulting.html, sorted by `order`.
+#
+# Fill in before switching on `features.consulting` in src/config/site.ts:
+#   calLink  - your Cal.com event, "<username>/<event-slug>" (e.g. "devops4solutions/intro-30").
+#              Without it, the Book button goes to the contact page with the session pre-filled.
+#   price    - { amount, currency }. Without it, the card shows "Price on request".
+#   bookingUrl - alternative to calLink for non-calendar purchases, e.g. a Stripe subscription
+#              Payment Link for monthly advisory.
+# Payment for calLink sessions is collected by Cal.com's Stripe app (configured in Cal.com, not here).
+
+- id: intro-30
+  order: 1
+  title: Intro call
+  durationMin: 30
+  billing: one-off
+  summary: A focused 30-minute call to understand your goals, current setup and where I can help.
+  includes:
+    - Quick review of your AWS / DevOps challenge
+    - Honest view on approach and effort
+    - Next-step recommendations
+  bestFor: Deciding whether to work together
+  cta: Book intro call
+
+- id: deep-dive-60
+  order: 2
+  title: Architecture deep dive
+  durationMin: 60
+  billing: one-off
+  featured: true
+  summary: A working session on one specific problem, such as a landing zone, Terraform structure, EKS design or a migration plan.
+  includes:
+    - Review of your architecture or code beforehand
+    - Concrete recommendations during the call
+    - Written summary of decisions and next steps
+  bestFor: Unblocking a design decision fast
+  cta: Book deep dive
+
+- id: mentoring-60
+  order: 3
+  title: 1:1 mentoring
+  durationMin: 60
+  billing: one-off
+  summary: Career and skills mentoring for DevOps and cloud engineers moving into platform or architecture roles.
+  includes:
+    - Personalised learning plan
+    - Interview and system-design practice
+    - Real-world AWS and Terraform guidance
+  bestFor: Engineers growing into senior or lead roles
+  cta: Book mentoring
+
+- id: advisory-monthly
+  order: 4
+  title: Monthly advisory
+  billing: monthly
+  summary: Ongoing access to an experienced platform engineer for architecture reviews, roadmap decisions and team guidance.
+  includes:
+    - Regular review calls each month
+    - Async questions between calls
+    - Architecture and pull-request reviews
+  bestFor: Teams without a dedicated platform architect
+  cta: Discuss advisory

@@ -1,31 +1,24 @@
 ---
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Container from "../../components/common/Container.astro";
 import SearchBox from "../../components/search/SearchBox.astro";
+import { getPublishedCaseStudies, getPublishedPosts, getPublishedVideos } from "../../lib/content/queries";
 
-const blog = (await getCollection("blog") as CollectionEntry<"blog">[])
-  .filter((item: CollectionEntry<"blog">) => !item.data.draft)
-  .map((item: CollectionEntry<"blog">) => ({
+const blog = (await getPublishedPosts()).map((item) => ({
     title: item.data.title,
     url: `/blog/${item.id}.html`,
     excerpt: item.data.description,
     type: "Blog",
   }));
 
-const caseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
-  .filter((item: CollectionEntry<"caseStudies">) => !item.data.draft)
-  .map((item: CollectionEntry<"caseStudies">) => ({
+const caseStudies = (await getPublishedCaseStudies()).map((item) => ({
     title: item.data.title,
     url: `/case-studies/${item.id}.html`,
     excerpt: item.data.description,
     type: "Case Study",
   }));
 
-const videos = (await getCollection("videos") as CollectionEntry<"videos">[])
-  .filter((item: CollectionEntry<"videos">) => !item.data.draft)
-  .map((item: CollectionEntry<"videos">) => ({
+const videos = (await getPublishedVideos({ indexable: true })).map((item) => ({
     title: item.data.title,
     url: `/videos/${item.id}.html`,
     excerpt: item.data.description,

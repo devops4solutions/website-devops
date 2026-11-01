@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# Search index fragments are for the on-site search, not for crawlers.
+Disallow: /pagefind/
 
 Sitemap: https://devops4solutions.com/sitemap-index.xml

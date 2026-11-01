@@ -31,7 +31,8 @@ const { fallbackItems = [] } = Astro.props;
 
 <script id="search-fallback-data" type="application/json" set:html={JSON.stringify(fallbackItems)}></script>
 
-<script type="module" is:inline>
+<script>
+  // Bundled (not inline) so the Content-Security-Policy can allow it without unsafe-inline.
   const form = document.querySelector("#search-form");
   const queryInput = document.querySelector("#q");
   const results = document.querySelector("#results");
@@ -42,13 +43,17 @@ const { fallbackItems = [] } = Astro.props;
     throw new Error("Search UI missing");
   }
 
-  const fallbackItems = fallbackScript?.textContent ? JSON.parse(fallbackScript.textContent) : [];
-  let pagefind;
+  type Item = { url: string; title?: string; excerpt?: string; type?: string; meta?: { title?: string; type?: string }; filters?: { type?: string[] } };
+  type Pagefind = { search: (term: string) => Promise<{ results: { data: () => Promise<Item> }[] }> };
+
+  const fallbackItems: Item[] = fallbackScript?.textContent ? JSON.parse(fallbackScript.textContent) : [];
+  let pagefind: Pagefind | undefined;
   let mode = "fallback";
 
   const init = async () => {
     try {
-      pagefind = await import(/* @vite-ignore */ "/pagefind/pagefind.js");
+      const pagefindUrl = "/pagefind/pagefind.js";
+      pagefind = (await import(/* @vite-ignore */ pagefindUrl)) as Pagefind;
       mode = "pagefind";
       status.textContent = "Search is ready.";
     } catch {
@@ -64,7 +69,7 @@ const { fallbackItems = [] } = Astro.props;
     }
   };
 
-  const escapeHtml = (value) =>
+  const escapeHtml = (value: string) =>
     value
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
@@ -72,22 +77,22 @@ const { fallbackItems = [] } = Astro.props;
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
-  const renderResults = (items) => {
+  const renderResults = (items: Item[]) => {
     results.innerHTML = items
       .map(
-        (item) => `<li><a class="block rounded-2xl border border-slate-200 bg-white p-4 no-underline shadow-sm transition hover:border-sky-300 hover:shadow-md" href="${item.url}"><h3 class="font-semibold text-slate-950">${escapeHtml(item.meta?.title || item.title || item.url)}</h3><p class="mt-1 text-sm text-slate-600">${item.excerpt || item.excerptHtml || ""}</p><p class="mt-2 text-xs font-medium uppercase tracking-wide text-sky-700">${escapeHtml(item.meta?.type || item.type || "page")}</p><p class="mt-1 text-xs text-slate-400">${escapeHtml(item.url)}</p></a></li>`,
+        (item) => `<li><a class="block rounded-2xl border border-slate-200 bg-white p-4 no-underline shadow-sm transition hover:border-sky-300 hover:shadow-md" href="${escapeHtml(item.url)}"><h3 class="font-semibold text-slate-950">${escapeHtml(item.meta?.title || item.title || item.url)}</h3><p class="mt-1 text-sm text-slate-600">${escapeHtml(item.excerpt || "")}</p><p class="mt-2 text-xs font-medium uppercase tracking-wide text-sky-700">${escapeHtml(item.filters?.type?.[0] || item.meta?.type || item.type || "page")}</p><p class="mt-1 text-xs text-slate-400">${escapeHtml(item.url)}</p></a></li>`,
       )
       .join("");
   };
 
-  const stripHtml = (value) => value.replace(/<[^>]+>/g, "");
+  const stripHtml = (value: string) => value.replace(/<[^>]+>/g, "");
 
-  const runFallbackSearch = (value) => {
+  const runFallbackSearch = (value: string) => {
     const terms = value.toLowerCase().split(/\s+/).filter(Boolean);
     const matches = fallbackItems
       .map((item) => {
         const haystack = `${item.title} ${item.excerpt} ${item.type}`.toLowerCase();
-        const score = terms.reduce((total, term) => total + (haystack.includes(term) ? 1 : 0), 0);
+        const score = terms.reduce((total: number, term: string) => total + (haystack.includes(term) ? 1 : 0), 0);
         return { ...item, score, meta: { title: item.title, type: item.type }, excerpt: item.excerpt };
       })
       .filter((item) => item.score > 0)
@@ -104,7 +109,7 @@ const { fallbackItems = [] } = Astro.props;
     renderResults(matches);
   };
 
-  const runSearch = async (value) => {
+  const runSearch = async (value: string) => {
     if (!value) {
       results.innerHTML = "";
       status.textContent = "Enter a query to begin.";

@@ -1,78 +1,72 @@
 ---
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Container from "../components/common/Container.astro";
 import Button from "../components/common/Button.astro";
+import { Image } from "astro:assets";
+import heroImage from "../assets/images/hero/hero-cloud-platform.png";
+import awsArchitectImage from "../assets/images/services/AWS-architect.png";
+import terraformImage from "../assets/images/services/Terraform.png";
+import eksImage from "../assets/images/services/Kubernetes-Amazon-EKS.png";
+import cicdImage from "../assets/images/services/CICD-Automation.png";
+import migrationImage from "../assets/images/services/Enterprise-Cloud-Migration.png";
+import observabilityImage from "../assets/images/services/Observability-Patch-Ops.png";
+import { getPublishedCaseStudies, getPublishedPosts, getPublishedVideos } from "../lib/content/queries";
+import { siteGraph } from "../lib/seo/schema";
 
-const allBlog = (await getCollection("blog") as CollectionEntry<"blog">[])
-	.filter((entry: CollectionEntry<"blog">) => !entry.data.draft)
-	.sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const allCaseStudies = (await getCollection("caseStudies") as CollectionEntry<"caseStudies">[])
-	.filter((entry: CollectionEntry<"caseStudies">) => !entry.data.draft)
-	.sort((a: CollectionEntry<"caseStudies">, b: CollectionEntry<"caseStudies">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const allVideos = (await getCollection("videos") as CollectionEntry<"videos">[])
-	.filter((entry: CollectionEntry<"videos">) => !entry.data.draft)
-	.sort((a: CollectionEntry<"videos">, b: CollectionEntry<"videos">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const allBlog = await getPublishedPosts();
+const allCaseStudies = await getPublishedCaseStudies();
+const allVideos = await getPublishedVideos({ indexable: true });
 
-const featuredCaseStudies = allCaseStudies.filter((item: CollectionEntry<"caseStudies">) => item.data.featured).slice(0, 3);
-const technologies = [
-	"AWS",
-	"Terraform",
-	"Kubernetes",
-	"EKS",
-	"ECS",
-	"Fargate",
-	"GitHub Actions",
-	"Jenkins",
-	"CloudFront",
-	"S3",
-	"RDS",
-	"Aurora PostgreSQL",
-	"Systems Manager",
-	"CloudWatch",
-	"Splunk",
-];
+const featuredCaseStudies = allCaseStudies.filter((item) => item.data.featured).slice(0, 3);
 
 const serviceTiles = [
 	{
 		name: "AWS Cloud Architecture",
 		description: "Design highly available, secure, and cost-optimized AWS platforms aligned with enterprise scale and compliance.",
-		image: "/images/services/AWS-architect.png",
+		image: awsArchitectImage,
 	},
 	{
 		name: "Terraform & Infrastructure as Code",
 		description: "Build consistent, repeatable cloud environments using modular Terraform patterns and policy-driven automation.",
-		image: "/images/services/Terraform.png",
+		image: terraformImage,
 	},
 	{
 		name: "Kubernetes & Amazon EKS",
 		description: "Run resilient container platforms on EKS with production-ready networking, security, and deployment standards.",
-		image: "/images/services/Kubernetes-Amazon-EKS.png",
+		image: eksImage,
 	},
 	{
 		name: "CI/CD Automation",
 		description: "Accelerate software delivery with reliable CI/CD pipelines using GitHub Actions, Jenkins, and AWS-native services.",
-		image: "/images/services/CICD-Automation.png",
+		image: cicdImage,
 	},
 	{
 		name: "Enterprise Cloud Migration",
 		description: "Modernize legacy workloads through structured migration plans that minimize risk, downtime, and operational friction.",
-		image: "/images/services/Enterprise-Cloud-Migration.png",
+		image: migrationImage,
 	},
 	{
 		name: "Observability & Patch Ops",
 		description: "Improve visibility, reliability, and security with end-to-end monitoring, alerting, and automated patch operations.",
-		image: "/images/services/Observability-Patch-Ops.png",
+		image: observabilityImage,
 	},
 ];
 ---
 
 <BaseLayout>
+	<script type="application/ld+json" set:html={JSON.stringify(siteGraph())}></script>
 	<!-- Hero -->
 	<section class="relative overflow-hidden border-b border-slate-200 bg-white py-16 sm:py-20">
 		<div class="pointer-events-none absolute inset-0" aria-hidden="true">
-			<img src="/images/hero/Designer.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-100" loading="lazy" decoding="async" />
+			<Image
+				src={heroImage}
+				alt=""
+				widths={[768, 1280, 1536]}
+				sizes="100vw"
+				class="absolute inset-0 h-full w-full object-cover"
+				loading="eager"
+				fetchpriority="high"
+			/>
 			<div class="absolute inset-0 bg-gradient-to-r from-white/92 via-white/80 to-white/70"></div>
 		</div>
 		<Container>
@@ -81,8 +75,8 @@ const serviceTiles = [
 				<h1 class="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">Scalable Cloud Platforms,<br/>Built for Production</h1>
 				<p class="mt-5 max-w-xl text-lg text-slate-500">Transform complex cloud initiatives into reliable, production-ready platforms with expert AWS architecture, automation, and DevOps execution.</p>
 				<div class="mt-8 flex flex-wrap gap-3">
-					<Button href="/case-studies.html">Case Studies</Button>
-					<Button href="/services.html" variant="secondary">View Services</Button>
+					<Button href="/contact.html">Discuss your project</Button>
+					<Button href="/case-studies.html" variant="secondary">View case studies</Button>
 				</div>
 			</div>
 		</Container>
@@ -93,18 +87,16 @@ const serviceTiles = [
 		<Container>
 			<div class="mb-8 flex items-end justify-between">
 				<h2 class="text-2xl font-bold text-slate-950">Services</h2>
-				<a href="/services.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+				<a href="/services.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">See all →</a>
 			</div>
 			<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 				{serviceTiles.map((service) => (
-					<a href="/services.html" class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
-						<img
+					<a href="/services.html" class="no-underline hover:no-underline group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+						<Image
 							src={service.image}
-							alt={service.name}
-							loading="lazy"
-							decoding="async"
-							width="640"
-							height="360"
+							alt=""
+							widths={[400, 800]}
+							sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
 							class="h-36 w-full object-cover"
 						/>
 						<div class="p-5">
@@ -127,12 +119,12 @@ const serviceTiles = [
 					<div>
 						<div class="mb-4 flex items-end justify-between">
 							<h2 class="text-xl font-bold text-slate-950">Latest Posts</h2>
-							<a href="/blog.html" class="text-sm text-blue-600 hover:underline">All posts →</a>
+							<a href="/blog.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">All posts →</a>
 						</div>
 						<ul class="space-y-3">
-							{allBlog.slice(0, 3).map((post: CollectionEntry<"blog">) => (
+							{allBlog.slice(0, 3).map((post) => (
 								<li>
-									<a href={`/blog/${post.id}.html`} class="block rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+									<a href={`/blog/${post.id}.html`} class="no-underline hover:no-underline block rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 										<p class="eyebrow">{post.data.category}</p>
 										<h3 class="mt-1 text-sm font-semibold text-slate-950">{post.data.title}</h3>
 									</a>
@@ -145,11 +137,11 @@ const serviceTiles = [
 					<div>
 						<div class="mb-6 flex items-end justify-between">
 							<h2 class="text-2xl font-bold text-slate-950">Case Studies</h2>
-							<a href="/case-studies.html" class="text-sm text-blue-600 hover:underline">See all →</a>
+							<a href="/case-studies.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">See all →</a>
 						</div>
 						<div class="space-y-4">
-							{featuredCaseStudies.slice(0, 3).map((item: CollectionEntry<"caseStudies">) => (
-								<a href={`/case-studies/${item.id}.html`} class="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+							{featuredCaseStudies.slice(0, 3).map((item) => (
+								<a href={`/case-studies/${item.id}.html`} class="no-underline hover:no-underline flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 									<div class="flex-1 min-w-0">
 										<p class="eyebrow">{item.data.industry ?? "General"}</p>
 										<h3 class="mt-1 text-sm font-semibold text-slate-950">{item.data.title}</h3>
@@ -167,12 +159,12 @@ const serviceTiles = [
 					<div>
 						<div class="mb-4 flex items-end justify-between">
 							<h2 class="text-xl font-bold text-slate-950">Videos</h2>
-							<a href="/videos.html" class="text-sm text-blue-600 hover:underline">All videos →</a>
+							<a href="/videos.html" class="inline-block py-1.5 text-sm text-blue-600 hover:underline">All videos →</a>
 						</div>
 						<ul class="space-y-3">
-							{allVideos.slice(0, 2).map((video: CollectionEntry<"videos">) => (
+							{allVideos.slice(0, 2).map((video) => (
 								<li>
-									<a href={`/videos/${video.id}.html`} class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
+									<a href={`/videos/${video.id}.html`} class="no-underline hover:no-underline flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm">
 										<img src={`https://img.youtube.com/vi/${video.data.youtubeId}/default.jpg`} alt="" width="60" height="45" class="rounded-lg object-cover" loading="lazy" />
 										<div class="min-w-0">
 											<p class="eyebrow">{video.data.category}</p>
@@ -196,7 +188,7 @@ const serviceTiles = [
 					<h2 class="text-xl font-bold text-slate-950">Need help designing or modernizing your AWS platform?</h2>
 					<p class="mt-1 text-sm text-slate-600">Architecture assessment, migration planning, or platform engineering support.</p>
 				</div>
-				<a href="/contact.html" class="shrink-0 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600 hover:text-white" style="text-decoration:none">Get in touch</a>
+				<Button href="/contact.html" class="shrink-0">Get in touch</Button>
 			</div>
 		</Container>
 	</section>

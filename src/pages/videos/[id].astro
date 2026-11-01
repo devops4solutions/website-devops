@@ -1,17 +1,16 @@
 ---
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ContentLayout from "../../layouts/ContentLayout.astro";
 import Container from "../../components/common/Container.astro";
 import VideoCard from "../../components/video/VideoCard.astro";
+import { getPublishedVideos } from "../../lib/content/queries";
 
 export async function getStaticPaths() {
-  const videos = (await getCollection("videos") as CollectionEntry<"videos">[])
-    .filter((video: CollectionEntry<"videos">) => !video.data.draft)
-    .sort((a: CollectionEntry<"videos">, b: CollectionEntry<"videos">) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  const videos = await getPublishedVideos();
 
-  return videos.map((video: CollectionEntry<"videos">) => ({
+  return videos.map((video) => ({
     params: { id: video.id },
     props: { video, videos },
   }));
@@ -26,9 +25,9 @@ const { video, videos } = Astro.props;
 const { Content } = await render(video);
 
 const related = videos
-  .filter((item: CollectionEntry<"videos">) => item.id !== video.id)
-  .filter((item: CollectionEntry<"videos">) =>
-    item.data.tags.some((tag: string) => video.data.tags.includes(tag)),
+  .filter((item) => item.id !== video.id)
+  .filter((item) =>
+    item.data.tags.some((tag) => video.data.tags.includes(tag)),
   )
   .slice(0, 3);
 
@@ -58,7 +57,7 @@ const breadcrumbSchema = {
 };
 ---
 
-<BaseLayout title={`${video.data.title} | DevOps4Solutions`} description={video.data.description} canonicalUrl={pageUrl} type="video.other" ogImage={thumb}>
+<BaseLayout title={`${video.data.title} | DevOps4Solutions`} description={video.data.description} canonicalUrl={pageUrl} type="video.other" ogImage={thumb} noindex={video.data.noindex} searchType="Video">
   <ContentLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Videos", href: "/videos.html" }, { label: video.data.title }]}
     title={video.data.title}
@@ -76,7 +75,7 @@ const breadcrumbSchema = {
     <Container className="pb-16">
       <h2 class="mb-4 text-2xl font-semibold text-slate-950">Related videos</h2>
       <div class="grid gap-6 md:grid-cols-3">
-        {related.map((item: CollectionEntry<"videos">) => <VideoCard video={item} />)}
+        {related.map((item) => <VideoCard video={item} />)}
       </div>
     </Container>
   )}

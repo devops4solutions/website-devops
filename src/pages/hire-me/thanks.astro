@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/common/Container.astro";
+import Button from "../../components/common/Button.astro";
+import { siteConfig } from "../../config/site";
+---
+
+<!-- Confirmation page after a project request; never indexed. -->
+<BaseLayout title="Request received | DevOps4Solutions" description="Thanks for your project request." noindex>
+  <Container className="py-16 sm:py-24">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="inline-flex size-14 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden="true">
+        <svg viewBox="0 0 20 20" class="size-7" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z"></path></svg>
+      </span>
+      <h1 class="mt-6 text-3xl font-bold tracking-tight text-ink sm:text-4xl">Thanks, your request is on its way</h1>
+      <p class="mt-4 text-lg text-ink-soft">
+        I'll review the details and reply by email with questions or an invitation to a short call. If it's urgent, email
+        <a href={`mailto:${siteConfig.email}`} class="inline-block break-all py-1">{siteConfig.email}</a>.
+      </p>
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <Button href="/case-studies.html">Read case studies</Button>
+        <Button href="/blog.html" variant="secondary">Browse the blog</Button>
+      </div>
+    </div>
+  </Container>
+</BaseLayout>

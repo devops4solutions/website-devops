@@ -1,4 +1,5 @@
 ---
+slug: "terraform-modules-enterprise-standardization"
 title: Terraform Modules for Enterprise Standardization
 description: How reusable Terraform modules improved consistency while planning migration of approximately 50–60 on-premises VMs to AWS.
 pubDate: 2026-05-10

@@ -1,4 +1,5 @@
 ---
+slug: "on-prem-vm-migration-to-aws"
 title: On-Prem VM Migration to AWS Landing Zone
 description: Planning and executing phased migration patterns for legacy virtual machines into AWS.
 pubDate: 2026-03-30
@@ -16,7 +17,7 @@ technologies:
 challenge: Existing VM estates lacked standard infrastructure definitions and repeatable migration patterns.
 solution: Built migration waves, standard images, and reusable infrastructure patterns to reduce variation.
 outcome: Teams achieved repeatable migration execution with stronger operational consistency.
-image: /images/case-studies/migration.svg
+image: ../../assets/images/case-studies/migration.svg
 imageAlt: On-prem to AWS migration architecture
 featured: true
 draft: false

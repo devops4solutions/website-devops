@@ -1,14 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Container from "../components/common/Container.astro";
+import Button from "../components/common/Button.astro";
 ---
 
 <BaseLayout title="About | DevOps4Solutions" description="About Nidhi Gupta and DevOps4Solutions.">
  	<Container className="py-14">
     <article class="mx-auto max-w-4xl">
-      <h1 class="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">About DevOps4Solutions</h1>
+      <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl">About DevOps4Solutions</h1>
 
-      <h2 class="mt-10 text-3xl font-bold text-slate-950">Building Enterprise Cloud Platforms That Scale</h2>
+      <h2 class="mt-10 text-2xl font-bold text-slate-950 sm:text-3xl">Building Enterprise Cloud Platforms That Scale</h2>
       <p class="mt-4 text-lg leading-relaxed text-slate-700">
         DevOps4Solutions was founded by <strong>Nidhi Gupta</strong>, a Lead Platform DevOps Engineer with over <strong>16 years of experience </strong>
          designing, automating, and modernizing enterprise cloud platforms. The mission is simple: transform complex cloud and DevOps
@@ -27,7 +28,7 @@ import Container from "../components/common/Container.astro";
       <h3 class="mt-10 text-2xl font-bold text-slate-950">Why DevOps4Solutions?</h3>
       <p class="mt-4 text-lg leading-relaxed text-slate-700">
         Technology evolves rapidly, but many organizations continue to struggle with cloud complexity, inconsistent automation, technical
-        debt, and operational challenges. DevOps4Solutions was created to assist devops engineers bridge the gap between theoretical best practices and real-world
+        debt, and operational challenges. DevOps4Solutions was created to help engineering teams bridge the gap between theoretical best practices and real-world
         enterprise implementation.
       </p>
       <p class="mt-4 text-lg leading-relaxed text-slate-700">
@@ -58,6 +59,14 @@ import Container from "../components/common/Container.astro";
         <li><strong>Continuously modernize through incremental improvements rather than disruptive rewrites.</strong></li>
       </ul>
      
+
+      <section class="mt-12 flex flex-col items-start justify-between gap-5 rounded-xl border border-blue-100 bg-blue-50 p-7 sm:flex-row sm:items-center">
+        <div>
+          <h2 class="text-xl font-bold text-slate-950">Planning an AWS platform, migration, or DevOps initiative?</h2>
+          <p class="mt-1 text-sm text-slate-600">Architecture reviews, migration planning, and hands-on platform engineering.</p>
+        </div>
+        <Button href="/contact.html">Get in touch</Button>
+      </section>
     </article>
   </Container>
 </BaseLayout>

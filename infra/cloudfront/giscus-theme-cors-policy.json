@@ -1,0 +1,15 @@
+{
+  "Name": "devops4solutions-giscus-theme-cors",
+  "Comment": "Lets giscus.app load /giscus-theme.css (the site-coloured comments theme) from inside its iframe. Attach to a cache behavior for the path pattern /giscus-theme.css.",
+  "CorsConfig": {
+    "AccessControlAllowOrigins": { "Quantity": 1, "Items": ["https://giscus.app"] },
+    "AccessControlAllowHeaders": { "Quantity": 1, "Items": ["*"] },
+    "AccessControlAllowMethods": { "Quantity": 2, "Items": ["GET", "HEAD"] },
+    "AccessControlAllowCredentials": false,
+    "AccessControlMaxAgeSec": 86400,
+    "OriginOverride": true
+  },
+  "SecurityHeadersConfig": {
+    "ContentTypeOptions": { "Override": true }
+  }
+}

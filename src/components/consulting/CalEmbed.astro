@@ -1,0 +1,46 @@
+---
+// Loads the Cal.com embed on the first click of a [data-cal-link] button and opens the booking pop-up.
+// Nothing from Cal.com loads until a visitor actually tries to book.
+---
+
+<script>
+  import { siteConfig } from "../../config/site";
+  import { track } from "../../lib/analytics/track";
+
+  type CalApi = ((...args: unknown[]) => void) & { loaded?: boolean; ns?: Record<string, unknown>; q?: unknown[] };
+  const w = window as Window & { Cal?: CalApi };
+  let initialised = false;
+  let currentSession = "";
+
+  // Equivalent of Cal.com's official loader snippet: queues calls until embed.js has loaded.
+  const loadCal = () => {
+    if (w.Cal) return;
+    const cal = function (...args: unknown[]) {
+      if (!cal.loaded) {
+        cal.ns = {};
+        cal.q = cal.q || [];
+        document.head.appendChild(document.createElement("script")).src = siteConfig.cal.embedScript;
+        cal.loaded = true;
+      }
+      cal.q!.push(args);
+    } as CalApi;
+    w.Cal = cal;
+  };
+
+  document.addEventListener("click", (event) => {
+    const button = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[data-cal-link]");
+    if (!button?.dataset.calLink) return;
+    event.preventDefault();
+    currentSession = button.dataset.session ?? "";
+
+    loadCal();
+    const Cal = w.Cal!;
+    if (!initialised) {
+      Cal("init", { origin: siteConfig.cal.origin });
+      Cal("ui", { theme: "light", cssVarsPerTheme: { light: { "cal-brand": "#2563eb" } } });
+      Cal("on", { action: "bookingSuccessful", callback: () => track("Booking completed", { session: currentSession }) });
+      initialised = true;
+    }
+    Cal("modal", { calLink: button.dataset.calLink, config: { layout: "month_view" } });
+  });
+</script>

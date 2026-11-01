@@ -1,4 +1,5 @@
 ---
+slug: "replace-with-permanent-url-slug"  # becomes the URL; never change after publishing
 title: "Draft case study title"
 description: "Short summary"
 pubDate: 2026-01-01

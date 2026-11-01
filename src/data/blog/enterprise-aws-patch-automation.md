@@ -1,4 +1,5 @@
 ---
+slug: "enterprise-aws-patch-automation"
 title: Enterprise AWS Patch Automation with Shared Ownership
 description: Building patch automation workflows using AWS Systems Manager with clear responsibilities between platform and application teams.
 pubDate: 2026-04-20
